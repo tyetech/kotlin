@@ -336,7 +336,7 @@ class MethodInliner(
                                 // 'This' in outer context corresponds to outer instance in current
                                 visitFieldInsn(
                                     Opcodes.GETSTATIC, owner,
-                                    CAPTURED_FIELD_FOLD_PREFIX + THIS_0, capturedParamDesc.type.descriptor
+                                    CAPTURED_FIELD_FOLD_PREFIX + AsmUtil.CAPTURED_THIS_FIELD, capturedParamDesc.type.descriptor
                                 )
                             } else {
                                 visitFieldInsn(

@@ -61,7 +61,6 @@ const val NUMBERED_FUNCTION_PREFIX = "kotlin/jvm/functions/Function"
 const val INLINE_FUN_VAR_SUFFIX = "\$iv"
 
 internal const val THIS = "this"
-internal const val THIS_0 = "this$0"
 internal const val FIRST_FUN_LABEL = "$$$$\$ROOT$$$$$"
 internal const val SPECIAL_TRANSFORMATION_NAME = "\$special"
 const val INLINE_TRANSFORMATION_SUFFIX = "\$inlined"
@@ -250,7 +249,7 @@ private fun String.isInteger(radix: Int = 10) = toIntOrNull(radix) != null
 internal fun isCapturedFieldName(fieldName: String): Boolean {
     // TODO: improve this heuristic
     return fieldName.startsWith(CAPTURED_FIELD_PREFIX) && !fieldName.startsWith(NON_CAPTURED_FIELD_PREFIX) ||
-            THIS_0 == fieldName ||
+            AsmUtil.CAPTURED_THIS_FIELD == fieldName ||
             RECEIVER_0 == fieldName
 }
 
@@ -532,7 +531,7 @@ fun isFakeLocalVariableForInline(name: String): Boolean {
     return name.startsWith(JvmAbi.LOCAL_VARIABLE_NAME_PREFIX_INLINE_FUNCTION) || name.startsWith(JvmAbi.LOCAL_VARIABLE_NAME_PREFIX_INLINE_ARGUMENT)
 }
 
-internal fun isThis0(name: String): Boolean = THIS_0 == name
+internal fun isThis0(name: String): Boolean = AsmUtil.CAPTURED_THIS_FIELD == name
 
 internal fun isSpecialEnumMethod(functionDescriptor: FunctionDescriptor): Boolean {
     val containingDeclaration = functionDescriptor.containingDeclaration as? PackageFragmentDescriptor ?: return false
