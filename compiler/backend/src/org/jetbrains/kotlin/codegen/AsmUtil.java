@@ -486,14 +486,15 @@ public class AsmUtil {
     public static void genClosureFields(@NotNull CalculatedClosure closure, ClassBuilder v, KotlinTypeMapper typeMapper) {
         List<Pair<String, Type>> allFields = new ArrayList<>();
 
-        ClassifierDescriptor captureThis = closure.getCaptureThis();
+        ClassifierDescriptor captureThis = closure.getCapturedOuterClassDescriptor();
         if (captureThis != null) {
             allFields.add(Pair.create(CAPTURED_THIS_FIELD, typeMapper.mapType(captureThis)));
         }
 
-        KotlinType captureReceiverType = closure.getCaptureReceiverType();
+        KotlinType captureReceiverType = closure.getCapturedReceiverFromOuterContext();
         if (captureReceiverType != null && !CallableReferenceUtilKt.isForCallableReference(closure)) {
-            allFields.add(Pair.create(CAPTURED_RECEIVER_FIELD, typeMapper.mapType(captureReceiverType)));
+            String fieldName = closure.getCapturedReceiverLabel(typeMapper.getBindingContext());
+            allFields.add(Pair.create(fieldName, typeMapper.mapType(captureReceiverType)));
         }
 
         allFields.addAll(closure.getRecordedFields());
@@ -703,15 +704,17 @@ public class AsmUtil {
         }
     }
 
-    public static String getReceiverParameterName(@NotNull FunctionDescriptor descriptor, @NotNull BindingContext bindingContext) {
-        String labelName = bindingContext.get(CodegenBinding.CALL_LABEL_FOR_LAMBDA_ARGUMENT, descriptor);
-        if (labelName != null) {
-            return LABELED_THIS + labelName;
-        }
+    public static String getReceiverParameterName(@NotNull CallableDescriptor descriptor, @NotNull BindingContext bindingContext) {
+        if (descriptor instanceof FunctionDescriptor) {
+            String labelName = bindingContext.get(CodegenBinding.CALL_LABEL_FOR_LAMBDA_ARGUMENT, (FunctionDescriptor) descriptor);
+            if (labelName != null) {
+                return LABELED_THIS + labelName;
+            }
 
-        if (descriptor instanceof VariableAccessorDescriptor) {
-            VariableAccessorDescriptor accessor = (VariableAccessorDescriptor) descriptor;
-            return getReceiverParameterName(accessor.getCorrespondingVariable().getName());
+            if (descriptor instanceof VariableAccessorDescriptor) {
+                VariableAccessorDescriptor accessor = (VariableAccessorDescriptor) descriptor;
+                return getReceiverParameterName(accessor.getCorrespondingVariable().getName());
+            }
         }
 
         return getReceiverParameterName(descriptor.getName());
@@ -719,7 +722,9 @@ public class AsmUtil {
 
     private static String getReceiverParameterName(@NotNull Name callableName) {
         if (callableName.isSpecial()) {
-            return CAPTURED_RECEIVER_FIELD;
+            String callableNameString = callableName.asString();
+            assert callableNameString.endsWith(">");
+            return LABELED_THIS + callableNameString.substring(1, callableNameString.length() - 1);
         }
 
         return LABELED_THIS + callableName.asString();
