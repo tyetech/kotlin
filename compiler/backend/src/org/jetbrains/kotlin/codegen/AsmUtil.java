@@ -117,6 +117,10 @@ public class AsmUtil {
     private AsmUtil() {
     }
 
+    public static String getCapturedFieldName(String originalName) {
+        return "$" + originalName;
+    }
+
     @NotNull
     public static Type boxType(@NotNull Type type) {
         Type boxedType = boxPrimitiveType(type);
@@ -704,7 +708,7 @@ public class AsmUtil {
         }
     }
 
-    public static String getReceiverParameterName(@NotNull CallableDescriptor descriptor, @NotNull BindingContext bindingContext) {
+    public static String getLabeledThisName(@NotNull CallableDescriptor descriptor, @NotNull BindingContext bindingContext) {
         if (descriptor instanceof FunctionDescriptor) {
             String labelName = bindingContext.get(CodegenBinding.CALL_LABEL_FOR_LAMBDA_ARGUMENT, (FunctionDescriptor) descriptor);
             if (labelName != null) {
@@ -713,14 +717,14 @@ public class AsmUtil {
 
             if (descriptor instanceof VariableAccessorDescriptor) {
                 VariableAccessorDescriptor accessor = (VariableAccessorDescriptor) descriptor;
-                return getReceiverParameterName(accessor.getCorrespondingVariable().getName());
+                return getLabeledThisName(accessor.getCorrespondingVariable().getName());
             }
         }
 
-        return getReceiverParameterName(descriptor.getName());
+        return getLabeledThisName(descriptor.getName());
     }
 
-    private static String getReceiverParameterName(@NotNull Name callableName) {
+    private static String getLabeledThisName(@NotNull Name callableName) {
         if (callableName.isSpecial()) {
             String callableNameString = callableName.asString();
             assert callableNameString.endsWith(">");
@@ -753,7 +757,7 @@ public class AsmUtil {
                 ReceiverParameterDescriptor receiverParameter = descriptor.getExtensionReceiverParameter();
                 if (receiverParameter != null) {
                     genParamAssertion(v, state.getTypeMapper(), frameMap, receiverParameter,
-                                      getReceiverParameterName(descriptor, state.getBindingContext()));
+                                      getLabeledThisName(descriptor, state.getBindingContext()));
                 }
             }
             return;
@@ -762,7 +766,7 @@ public class AsmUtil {
         ReceiverParameterDescriptor receiverParameter = descriptor.getExtensionReceiverParameter();
         if (receiverParameter != null) {
             genParamAssertion(v, state.getTypeMapper(), frameMap, receiverParameter,
-                              getReceiverParameterName(descriptor, state.getBindingContext()));
+                              getLabeledThisName(descriptor, state.getBindingContext()));
         }
 
         for (ValueParameterDescriptor parameter : descriptor.getValueParameters()) {

@@ -105,7 +105,7 @@ public final class MutableClosure implements CalculatedClosure {
             // Should effectively be returned only for callable references
             return AsmUtil.CAPTURED_RECEIVER_FIELD;
         } else if (enclosingFunWithReceiverDescriptor != null) {
-            return AsmUtil.getReceiverParameterName(enclosingFunWithReceiverDescriptor, bindingContext);
+            return AsmUtil.getCapturedFieldName(AsmUtil.getLabeledThisName(enclosingFunWithReceiverDescriptor, bindingContext));
         } else {
             throw new IllegalStateException("Closure does not capture an outer receiver");
         }
