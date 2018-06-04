@@ -1012,7 +1012,7 @@ class MethodInliner(
             val lambdaAccessChain = mutableListOf<AbstractInsnNode>(aload0).apply {
                 addAll(InsnSequence(aload0.next, null).filter { it.isMeaningful }.takeWhile {
                     insnNode ->
-                    insnNode is FieldInsnNode && "this$0" == insnNode.name
+                    insnNode is FieldInsnNode && AsmUtil.CAPTURED_THIS_FIELD == insnNode.name
                 }.toList())
             }
 
