@@ -144,7 +144,7 @@ class DefaultLambda(
                 if (isFunctionReference || isPropertyReference)
                     constructor?.desc?.let { Type.getArgumentTypes(it) }?.singleOrNull()?.let {
                         originalBoundReceiverType = it
-                        listOf(capturedParamDesc(AsmUtil.RECEIVER_NAME, it.boxReceiverForBoundReference()))
+                        listOf(capturedParamDesc(AsmUtil.CAPTURED_RECEIVER_FIELD, it.boxReceiverForBoundReference()))
                     } ?: emptyList()
                 else
                     constructor?.findCapturedFieldAssignmentInstructions()?.map { fieldNode ->

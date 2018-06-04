@@ -144,7 +144,7 @@ class FrameVisitor(val context: EvaluationContextImpl) {
 
     private fun findUnlabeledThis(frame: StackFrameProxyImpl, asmType: Type?): Value? {
         frame.visibleVariables()
-            .filter { it.name().startsWith("this@") }
+            .filter { it.name().startsWith(AsmUtil.LABELED_THIS) }
             .takeIf { it.isNotEmpty() }
             ?.maxBy { it.variable }
             ?.let { return frame.getValue(it).asValue() }

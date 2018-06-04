@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.kapt3.stubs
 
+import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.kapt3.util.isAbstract
 import org.jetbrains.kotlin.kapt3.util.isEnum
 import org.jetbrains.kotlin.kapt3.util.isJvmOverloadsGenerated
@@ -68,6 +69,11 @@ internal fun MethodNode.getParametersInfo(containingClass: ClassNode): List<Para
         // Property setters has bad parameter names
         if (name.startsWith("<") && name.endsWith(">")) {
             name = "p${index - startParameterIndex}"
+        }
+
+        if (name.startsWith(AsmUtil.LABELED_THIS)) {
+            // Java does not support '@' in identifiers
+            name = "this$" + name.drop(AsmUtil.LABELED_THIS.length)
         }
 
         val visibleAnnotations = visibleParameterAnnotations?.get(index)

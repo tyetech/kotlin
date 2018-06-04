@@ -90,12 +90,14 @@ public class AsmUtil {
             .put(JavaVisibilities.PACKAGE_VISIBILITY, NO_FLAG_PACKAGE_PRIVATE)
             .build();
 
+    public static final String LABELED_THIS = "this@";
+
+    public static final String CAPTURED_THIS_FIELD = "$this";
+
     // 'kotlin.jvm.internal.CallableReference' has a 'receiver' field
     public static final String BOUND_REFERENCE_RECEIVER = "receiver";
 
-    public static final String RECEIVER_NAME = "$receiver";
-    public static final String CAPTURED_RECEIVER_FIELD = "receiver$0";
-    public static final String CAPTURED_THIS_FIELD = "$this";
+    public static final String CAPTURED_RECEIVER_FIELD = "$receiver";
 
     private static final ImmutableMap<Integer, JvmPrimitiveType> primitiveTypeByAsmSort;
     private static final ImmutableMap<Type, Type> primitiveTypeByBoxedType;
@@ -704,7 +706,7 @@ public class AsmUtil {
     public static String getReceiverParameterName(@NotNull FunctionDescriptor descriptor, @NotNull BindingContext bindingContext) {
         String labelName = bindingContext.get(CodegenBinding.CALL_LABEL_FOR_LAMBDA_ARGUMENT, descriptor);
         if (labelName != null) {
-            return "this@" + labelName;
+            return LABELED_THIS + labelName;
         }
 
         if (descriptor instanceof VariableAccessorDescriptor) {
@@ -717,10 +719,10 @@ public class AsmUtil {
 
     private static String getReceiverParameterName(@NotNull Name callableName) {
         if (callableName.isSpecial()) {
-            return RECEIVER_NAME;
+            return CAPTURED_RECEIVER_FIELD;
         }
 
-        return "this@" + callableName.asString();
+        return LABELED_THIS + callableName.asString();
     }
 
     static void genNotNullAssertionsForParameters(
