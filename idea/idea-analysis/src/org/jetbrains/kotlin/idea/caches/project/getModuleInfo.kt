@@ -5,11 +5,13 @@
 
 package org.jetbrains.kotlin.idea.caches.project
 
+import com.intellij.codeInsight.daemon.OutsidersPsiFileSupport
 import com.intellij.ide.scratch.ScratchFileService
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.*
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -30,6 +32,7 @@ import org.jetbrains.kotlin.script.findScriptDefinition
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.sure
 import org.jetbrains.kotlin.utils.yieldIfNotNull
+import java.io.File
 import kotlin.coroutines.experimental.buildSequence
 
 var PsiFile.forcedModuleInfo: ModuleInfo? by UserDataProperty(Key.create("FORCED_MODULE_INFO"))
@@ -60,9 +63,7 @@ fun getLibrarySourcesModuleInfos(project: Project, virtualFile: VirtualFile) =
     )
 
 fun getScriptRelatedModuleInfo(project: Project, virtualFile: VirtualFile): ModuleSourceInfo? {
-    val projectFileIndex = ProjectFileIndex.SERVICE.getInstance(project)
-
-    val moduleRelatedModuleInfo = getModuleRelatedModuleInfo(projectFileIndex, virtualFile)
+    val moduleRelatedModuleInfo = getModuleRelatedModuleInfo(project, virtualFile)
     if (moduleRelatedModuleInfo != null) {
         return moduleRelatedModuleInfo
     }
@@ -168,7 +169,7 @@ private fun <T> PsiElement.collectInfos(c: ModuleInfoCollector<T>): T {
             ?: return c.onFailure("Analyzing element of type ${this::class.java} in non-physical file $containingFile of type ${containingFile::class.java}\nText:\n$text")
 
     if (containingKtFile?.isScript() == true) {
-        getModuleRelatedModuleInfo(ProjectFileIndex.SERVICE.getInstance(project), virtualFile)?.let {
+        getModuleRelatedModuleInfo(project, virtualFile)?.let {
             return c.onResult(it)
         }
         findScriptDefinition(virtualFile, project)?.let {
@@ -211,7 +212,7 @@ private inline fun <T> collectInfosByVirtualFile(
 
     val projectFileIndex = ProjectFileIndex.SERVICE.getInstance(project)
 
-    val moduleRelatedModuleInfo = getModuleRelatedModuleInfo(projectFileIndex, virtualFile)
+    val moduleRelatedModuleInfo = getModuleRelatedModuleInfo(project, virtualFile)
     if (moduleRelatedModuleInfo != null) {
         onOccurrence(moduleRelatedModuleInfo)
     }
@@ -236,7 +237,12 @@ private inline fun <T> collectInfosByVirtualFile(
     return onOccurrence(null)
 }
 
-private fun getModuleRelatedModuleInfo(projectFileIndex: ProjectFileIndex, virtualFile: VirtualFile): ModuleSourceInfo? {
+private fun getModuleRelatedModuleInfo(
+    project: Project,
+    virtualFile: VirtualFile
+): ModuleSourceInfo? {
+    val projectFileIndex = ProjectFileIndex.SERVICE.getInstance(project)
+
     val module = projectFileIndex.getModuleForFile(virtualFile)
     if (module != null && !module.isDisposed) {
         val moduleFileIndex = ModuleRootManager.getInstance(module).fileIndex
@@ -246,6 +252,30 @@ private fun getModuleRelatedModuleInfo(projectFileIndex: ProjectFileIndex, virtu
             return module.productionSourceInfo()
         }
     }
+    val originalFilePath = OutsidersPsiFileSupport.getOriginalFilePath(virtualFile)
+    if (originalFilePath != null) {
+        val originalFile = getFirstExistentByParent(File(originalFilePath), project)?.let { VfsUtil.findFileByIoFile(it, false) }
+        if (originalFile != null) {
+            return getModuleRelatedModuleInfo(project, originalFile)
+        }
+    }
+    return null
+}
+
+private fun getFirstExistentByParent(file: File, project: Project): File? {
+    if (file.exists()) return file
+
+    var parent: File? = file.parentFile
+    while (parent != null) {
+        if (file.canonicalPath == project.baseDir.canonicalPath) {
+            break
+        }
+        if (parent.exists()) {
+            return parent
+        }
+        parent = parent.parentFile
+    }
+
     return null
 }
 

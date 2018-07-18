@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.idea.highlighter
 
+import com.intellij.codeInsight.daemon.OutsidersPsiFileSupport
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.idea.caches.project.NotUnderContentRootModuleInfo
 import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
@@ -38,6 +39,10 @@ object KotlinHighlightingUtil {
 
         if (ktFile.isScript()) {
             return shouldHighlightScript(ktFile)
+        }
+
+        if (OutsidersPsiFileSupport.isOutsiderFile(ktFile)) {
+            return true
         }
 
         return ProjectRootsUtil.isInProjectOrLibraryContent(ktFile) && ktFile.getModuleInfo() !is NotUnderContentRootModuleInfo
