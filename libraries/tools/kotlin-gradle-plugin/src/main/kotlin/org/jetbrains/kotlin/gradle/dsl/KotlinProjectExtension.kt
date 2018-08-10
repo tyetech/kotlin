@@ -58,6 +58,20 @@ open class KotlinJvmProjectExtension : KotlinSingleJavaTargetExtension() {
 
 open class ExperimentalExtension {
     var coroutines: Coroutines? = null
+    var newInference: NewInferenceState? = null
+}
+
+enum class NewInferenceState {
+    ENABLE,
+    DISABLE;
+
+    companion object {
+        val DEFAULT = NewInferenceState.DISABLE
+
+        fun byCompilerArgument(argument: String): NewInferenceState? =
+            NewInferenceState.values().byCompilerArgument(argument)
+    }
+
 }
 
 enum class Coroutines {
@@ -69,6 +83,9 @@ enum class Coroutines {
         val DEFAULT = WARN
 
         fun byCompilerArgument(argument: String): Coroutines? =
-                Coroutines.values().firstOrNull { it.name.equals(argument, ignoreCase = true) }
+            Coroutines.values().byCompilerArgument(argument)
     }
 }
+
+private fun <T : Enum<T>> Array<T>.byCompilerArgument(argument: String): T? =
+    firstOrNull { it.name.equals(argument, ignoreCase = true) }

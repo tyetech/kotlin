@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.utils.ParsedGradleVersion
 import org.jetbrains.kotlin.gradle.utils.toSortedPathsArray
 import org.jetbrains.kotlin.gradle.utils.isParentOf
-import org.jetbrains.kotlin.incremental.*
 import org.jetbrains.kotlin.utils.LibraryUtils
 import java.io.File
 import java.util.*
@@ -178,8 +177,21 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
 
     private val coroutines: Coroutines
         get() = kotlinExt.experimental.coroutines
-                ?: coroutinesFromGradleProperties
-                ?: Coroutines.DEFAULT
+            ?: coroutinesFromGradleProperties
+            ?: Coroutines.DEFAULT
+
+    @get:Internal
+    internal var newInferenceFromGradleProperties: NewInferenceState? = null
+
+    @get:Input
+    internal val newInferenceStr: String
+        get() = newInference.name
+
+    private val newInference: NewInferenceState
+        get() = kotlinExt.experimental.newInference
+            ?: newInferenceFromGradleProperties
+            ?: NewInferenceState.DEFAULT
+
 
     @get:Internal
     internal var friendTaskName: String? = null
