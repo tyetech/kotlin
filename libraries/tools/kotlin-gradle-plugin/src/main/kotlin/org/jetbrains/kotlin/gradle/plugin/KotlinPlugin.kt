@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.gradle.tasks.*
 import org.jetbrains.kotlin.gradle.utils.*
 import java.io.File
 import java.net.URL
-import java.util.*
 import java.util.concurrent.Callable
 import java.util.jar.Manifest
 
@@ -431,13 +430,9 @@ internal abstract class AbstractKotlinPlugin(
 
             // Don't set the attributes for common module; otherwise their 'common' platform won't be compatible with the one in
             // platform-specific modules
-            if (kotlinTarget.platformType != KotlinPlatformType.common) {
-                project.dependencies.attributesSchema.attribute(KotlinPlatformType.attribute)
-                project.configurations.getByName(kotlinTarget.apiElementsConfigurationName).usesPlatformOf(kotlinTarget)
-                project.configurations.getByName(kotlinTarget.runtimeElementsConfigurationName).usesPlatformOf(kotlinTarget)
-                kotlinTarget.compilations.all { compilation ->
-                    KotlinTargetConfigurator.defineConfigurationsForCompilation(compilation, kotlinTarget, project.configurations)
-                }
+            project.dependencies.attributesSchema.attribute(KotlinPlatformType.attribute)
+            kotlinTarget.compilations.all { compilation ->
+                KotlinTargetConfigurator.defineConfigurationsForCompilation(compilation, kotlinTarget, project.configurations)
             }
         }
 
