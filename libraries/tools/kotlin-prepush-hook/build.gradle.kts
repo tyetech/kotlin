@@ -7,7 +7,7 @@ apply { plugin("jps-compatible") }
 jvmTarget = "1.6"
 
 sourceSets {
-    "main" { projectDefault() }
+    "main" { projectDefault(project) }
     "test" {}
 }
 

@@ -22,7 +22,7 @@ dependencies {
 
 sourceSets {
     "main" {
-        projectDefault()
+        projectDefault(project)
         java.srcDir("../js.inliner/src")
     }
     "test" {}

@@ -39,7 +39,7 @@ dependencies {
 }
 
 sourceSets {
-    "main" { projectDefault() }
+    "main" { projectDefault(project) }
     "test" {
         java.srcDirs("jps-tests/test")
     }

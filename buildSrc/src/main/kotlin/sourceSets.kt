@@ -1,9 +1,10 @@
 @file:Suppress("unused") // usages in build scripts are not tracked properly
 
-import org.gradle.api.*
-import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.*
-import org.gradle.kotlin.dsl.*
+import org.gradle.api.Project
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.language.jvm.tasks.ProcessResources
+
 //import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 inline fun Project.sourceSets(crossinline body: SourceSetsBuilder.() -> Unit) =
@@ -25,12 +26,13 @@ fun SourceSet.none() {
     resources.setSrcDirs(emptyList<String>())
 }
 
-fun SourceSet.projectDefault() {
+fun SourceSet.projectDefault(project: Project) {
     when (name) {
         "main" -> {
             java.srcDirs("src")
-            resources.srcDir("resources").apply { include("**") }
-            resources.srcDir("src").apply { include("META-INF/**", "**/*.properties") }
+            val processResources = project.tasks.getByName(processResourcesTaskName) as ProcessResources
+            processResources.from("resources") { include("**") }
+            processResources.from("src") { include("META-INF/**", "**/*.properties") }
         }
         "test" -> {
             java.srcDirs("test", "tests")

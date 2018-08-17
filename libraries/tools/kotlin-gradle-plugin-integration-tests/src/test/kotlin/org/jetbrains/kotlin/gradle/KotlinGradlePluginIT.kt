@@ -826,4 +826,23 @@ class KotlinGradleIT : BaseGradleIT() {
             assertTasksExecuted(compileKotlinTasks)
         }
     }
+
+    @Test
+    fun testResourcesTracking() = with(Project("simpleProject")) {
+        setupWorkingDir()
+        gradleBuildScript().appendText(
+            "\n" + """
+            sourceSets.main.resources.srcDir('src/main/kotlin')
+            kotlin.target.compilations.main.source(kotlin.sourceSets.create('foo'))
+            """.trimIndent()
+        )
+        projectDir.resolve("src/foo/kotlin/foo.kt").apply { parentFile.mkdirs(); writeText("val foo = 1") }
+
+        build("processResources") {
+            assertSuccessful()
+            assertTasksExecuted(":processResources")
+            assertFileExists("build/resources/main/helloWorld.kt")
+            assertFileExists("build/resources/main/foo.kt")
+        }
+    }
 }

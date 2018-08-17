@@ -99,7 +99,7 @@ dependencies {
 sourceSets {
     "main" {}
     "test" {
-        projectDefault()
+        projectDefault(project)
     }
 }
 

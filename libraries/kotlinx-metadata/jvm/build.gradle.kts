@@ -24,8 +24,8 @@ jvmTarget = "1.6"
 javaHome = rootProject.extra["JDK_16"] as String
 
 sourceSets {
-    "main" { projectDefault() }
-    "test" { projectDefault() }
+    "main" { projectDefault(project) }
+    "test" { projectDefault(project) }
 }
 
 val shadows by configurations.creating {

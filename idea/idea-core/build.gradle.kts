@@ -28,7 +28,7 @@ dependencies {
 
 sourceSets {
     "main" {
-        projectDefault()
+        projectDefault(project)
         java.srcDir("../idea-analysis/src")
         resources.srcDir("../idea-analysis/src").apply { include("**/*.properties") }
     }

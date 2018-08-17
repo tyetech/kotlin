@@ -15,7 +15,7 @@ dependencies {
 
 sourceSets {
     "main" {}
-    "test" { projectDefault() }
+    "test" { projectDefault(project) }
 }
 
 tasks.withType<KotlinCompile> {
