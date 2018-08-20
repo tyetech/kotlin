@@ -130,9 +130,9 @@ dependencies {
 val preparedResources = File(buildDir, "prepResources")
 
 sourceSets {
-    "main" { projectDefault() }
+    "main" { projectDefault(project) }
     "test" {
-        projectDefault()
+        projectDefault(project)
         resources.srcDir(preparedResources)
     }
 }

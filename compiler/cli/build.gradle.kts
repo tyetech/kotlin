@@ -34,7 +34,7 @@ dependencies {
 
 sourceSets {
     "main" {
-        projectDefault()
+        projectDefault(project)
         java.srcDirs("../builtins-serializer/src",
                      "../javac-wrapper/src")
     }

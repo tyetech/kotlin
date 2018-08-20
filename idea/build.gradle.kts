@@ -104,7 +104,7 @@ dependencies {
 
 sourceSets {
     "main" {
-        projectDefault()
+        projectDefault(project)
         java.srcDirs(
             "idea-completion/src",
             "idea-live-templates/src",
@@ -113,7 +113,7 @@ sourceSets {
         resources.srcDirs("idea-repl/src").apply { include("META-INF/**") }
     }
     "test" {
-        projectDefault()
+        projectDefault(project)
         java.srcDirs(
             "idea-completion/tests",
             "idea-live-templates/tests"

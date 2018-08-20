@@ -38,8 +38,8 @@ dependencies {
 }
 
 sourceSets {
-    "main" { projectDefault() }
-    "test" { projectDefault() }
+    "main" { projectDefault(project) }
+    "test" { projectDefault(project) }
 }
 
 runtimeJar {

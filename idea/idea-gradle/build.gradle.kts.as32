@@ -53,10 +53,10 @@ dependencies {
 
 sourceSets {
     "main" {
-        projectDefault()
+        projectDefault(project)
         resources.srcDir("res").apply { include("**") }
     }
-    "test" { projectDefault() }
+    "test" { projectDefault(project) }
 }
 
 testsJar()

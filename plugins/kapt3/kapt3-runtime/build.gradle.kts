@@ -12,7 +12,7 @@ dependencies {
 jvmTarget = "1.6"
 
 sourceSets {
-    "main" { projectDefault() }
+    "main" { projectDefault(project) }
     "test" {}
 }
 

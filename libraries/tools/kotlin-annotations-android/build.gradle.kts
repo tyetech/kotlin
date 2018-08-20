@@ -18,7 +18,7 @@ tasks.withType<KotlinCompile> {
 
 sourceSets {
     "main" {
-        projectDefault()
+        projectDefault(project)
     }
 }
 

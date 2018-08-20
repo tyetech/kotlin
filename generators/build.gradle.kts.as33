@@ -6,7 +6,7 @@ plugins {
 
 sourceSets {
     "main" { }
-    "test" { projectDefault() }
+    "test" { projectDefault(project) }
 }
 
 val builtinsSourceSet = sourceSets.create("builtins") {
