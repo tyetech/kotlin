@@ -1,3 +1,4 @@
+// IGNORE_BACKEND: JVM_IR
 fun foo() {
     bar {
         nop()
@@ -16,4 +17,4 @@ inline fun baz() {
 
 fun nop() {}
 
-// 2 20 21 3 4 25 26 5 27 6 9 10 11 14 15 17
+// 3 21 22 4 5 26 27 6 28 7 10 11 12 15 16 18

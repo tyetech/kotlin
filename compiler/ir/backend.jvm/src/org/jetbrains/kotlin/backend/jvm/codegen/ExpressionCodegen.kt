@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
+import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicFunction
 import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicMethods
 import org.jetbrains.kotlin.backend.jvm.lower.CrIrType
@@ -117,12 +118,9 @@ class ExpressionCodegen(
     fun generate() {
         mv.visitCode()
         val startLabel = markNewLabel()
-        irFunction.markLineNumber(true)
         val info = BlockInfo.create()
         val result = irFunction.body!!.accept(this, info)
-
-        irFunction.markLineNumber(false)
-
+        markFunctionLineNumber()
         val returnType = typeMapper.mapReturnType(irFunction.descriptor)
         if (irFunction.body is IrExpressionBody) {
             mv.areturn(returnType)
@@ -138,6 +136,28 @@ class ExpressionCodegen(
         writeLocalVariablesInTable(info)
         writeParameterInLocalVariableTable(startLabel)
         mv.visitEnd()
+    }
+
+    private fun markFunctionLineNumber() {
+        if (irFunction.origin == JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER) {
+            return
+        }
+        if (irFunction is IrConstructor && irFunction.isPrimary) {
+            irFunction.markLineNumber(startOffset = true)
+            return
+        }
+        val lastElement = irFunction.body!!.getLastElement()
+        if (lastElement !is IrReturn) {
+            irFunction.markLineNumber(startOffset = false)
+        }
+    }
+
+    private fun IrElement.getLastElement(): IrElement {
+        return when (this) {
+            is IrStatementContainer -> if (this.statements.isEmpty()) this else this.statements[this.statements.size - 1].getLastElement()
+            is IrExpressionBody -> this.expression.getLastElement()
+            else -> this
+        }
     }
 
     private fun writeParameterInLocalVariableTable(startLabel: Label) {
@@ -174,7 +194,9 @@ class ExpressionCodegen(
 
     override fun visitBlockBody(body: IrBlockBody, data: BlockInfo): StackValue {
         return body.statements.fold(none()) { _, exp ->
-            exp.accept(this, data)
+            val result = exp.accept(this, data)
+            (exp as? IrExpression)?.markEndOfStatementIfNeeded()
+            result
         }
     }
 
@@ -222,10 +244,12 @@ class ExpressionCodegen(
     }
 
     override fun visitMemberAccess(expression: IrMemberAccessExpression, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         return generateCall(expression, null, data)
     }
 
     override fun visitCall(expression: IrCall, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         if (expression.descriptor is ConstructorDescriptor) {
             return generateNewCall(expression, data)
         }
@@ -366,8 +390,11 @@ class ExpressionCodegen(
         val varType = typeMapper.mapType(declaration.descriptor)
         val index = frame.enter(declaration.symbol, varType)
 
+        declaration.markLineNumber(startOffset = true)
+
         declaration.initializer?.apply {
             StackValue.local(index, varType).store(gen(this, varType, data), mv)
+            this.markLineNumber(startOffset = true)
         }
 
         val info = VariableInfo(
@@ -391,6 +418,7 @@ class ExpressionCodegen(
     }
 
     override fun visitGetValue(expression: IrGetValue, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         return generateLocal(expression.symbol, expression.asmType)
     }
 
@@ -409,12 +437,14 @@ class ExpressionCodegen(
     }
 
     override fun visitGetField(expression: IrGetField, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         val value = generateFieldValue(expression, data)
         value.put(value.type, mv)
         return onStack(value.type)
     }
 
     override fun visitSetField(expression: IrSetField, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         val fieldValue = generateFieldValue(expression, data)
         fieldValue.store(expression.value.accept(this, data), mv)
         return none()
@@ -449,12 +479,15 @@ class ExpressionCodegen(
     }
 
     override fun visitSetVariable(expression: IrSetVariable, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
+        expression.value.markLineNumber(startOffset = true)
         val value = expression.value.accept(this, data)
         StackValue.local(findLocalIndex(expression.symbol), expression.descriptor.asmType).store(value, mv)
         return none()
     }
 
     override fun <T> visitConst(expression: IrConst<T>, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         val value = expression.value
         val type = expression.asmType
         StackValue.constant(value, type).put(type, mv)
@@ -479,6 +512,7 @@ class ExpressionCodegen(
     }
 
     override fun visitVararg(expression: IrVararg, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         val outType = expression.type
         val type = expression.asmType
         assert(type.sort == Type.ARRAY)
@@ -587,7 +621,7 @@ class ExpressionCodegen(
         val afterReturnLabel = Label()
         generateFinallyBlocksIfNeeded(returnType, afterReturnLabel, data)
 
-        expression.markLineNumber(false)
+        expression.markLineNumber(startOffset = true)
         mv.areturn(returnType)
         mv.mark(afterReturnLabel)
         mv.nop()/*TODO check RESTORE_STACK_IN_TRY_CATCH processor*/
@@ -595,8 +629,10 @@ class ExpressionCodegen(
     }
 
 
-    override fun visitWhen(expression: IrWhen, data: BlockInfo): StackValue =
-        genIfWithBranches(expression.branches[0], data, expression.type.toKotlinType(), expression.branches.drop(1))
+    override fun visitWhen(expression: IrWhen, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
+        return genIfWithBranches(expression.branches[0], data, expression.type.toKotlinType(), expression.branches.drop(1))
+    }
 
 
     private fun genIfWithBranches(branch: IrBranch, data: BlockInfo, type: KotlinType, otherBranches: List<IrBranch>): StackValue {
@@ -635,6 +671,7 @@ class ExpressionCodegen(
         when (expression.operator) {
             IrTypeOperator.IMPLICIT_COERCION_TO_UNIT -> {
                 val result = expression.argument.accept(this, data)
+                expression.argument.markEndOfStatementIfNeeded()
                 coerce(result.type, Type.VOID_TYPE, mv)
                 return none()
             }
@@ -682,7 +719,21 @@ class ExpressionCodegen(
         return expression.onStack
     }
 
+    private fun IrExpression.markEndOfStatementIfNeeded() {
+        when (this) {
+            is IrWhen -> if (this.branches.size > 1) {
+                this.markLineNumber(false)
+            }
+            is IrTry -> this.markLineNumber(false)
+            is IrContainerExpression -> when (this.origin) {
+                IrStatementOrigin.WHEN, IrStatementOrigin.IF ->
+                    this.markLineNumber(false)
+            }
+        }
+    }
+
     override fun visitStringConcatenation(expression: IrStringConcatenation, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         AsmUtil.genStringBuilderConstructor(mv)
         expression.arguments.forEach {
             val stackValue = gen(it, data)
@@ -708,6 +759,7 @@ class ExpressionCodegen(
         // GOTO L0
         // L1
         //TODO: write elimination lower
+        condition.markLineNumber(startOffset = true)
         if (!(condition is IrConst<*> && condition.value == true)) {
             gen(condition, data)
             BranchedValue.condJump(StackValue.onStack(condition.asmType), endLabel, true, mv)
@@ -729,6 +781,7 @@ class ExpressionCodegen(
     }
 
     override fun visitBreakContinue(jump: IrBreakContinue, data: BlockInfo): StackValue {
+        jump.markLineNumber(startOffset = true)
         generateBreakOrContinueExpression(jump, Label(), data)
         return none()
     }
@@ -784,6 +837,7 @@ class ExpressionCodegen(
 
         mv.visitLabel(continueLabel)
         val condition = loop.condition
+        condition.markLineNumber(startOffset = true)
         gen(condition, data)
         BranchedValue.condJump(StackValue.onStack(condition.asmType), entry, false, mv)
         mv.mark(endLabel)
@@ -792,6 +846,7 @@ class ExpressionCodegen(
     }
 
     override fun visitTry(aTry: IrTry, data: BlockInfo): StackValue {
+        aTry.markLineNumber(startOffset = true)
         val finallyExpression = aTry.finallyExpression
         val tryInfo = if (finallyExpression != null) TryInfo(aTry) else null
         if (tryInfo != null) {
@@ -817,6 +872,7 @@ class ExpressionCodegen(
             mv.store(index, descriptorType)
 
             val catchBody = clause.result
+            catchBody.markLineNumber(true)
             gen(catchBody, catchBody.asmType, data)
 
             frame.leave(clause.catchParameter)
@@ -915,6 +971,9 @@ class ExpressionCodegen(
         }
 
         if (tryCatchBlockEnd != null) {
+            if (tryInfo != null) {
+                tryInfo.tryBlock.finallyExpression!!.markLineNumber(startOffset = false)
+            }
             mv.goTo(tryCatchBlockEnd)
         }
 
@@ -963,6 +1022,7 @@ class ExpressionCodegen(
     }
 
     override fun visitThrow(expression: IrThrow, data: BlockInfo): StackValue {
+        expression.markLineNumber(startOffset = true)
         gen(expression.value, JAVA_THROWABLE_TYPE, data)
         mv.athrow()
         return none()
@@ -1120,8 +1180,7 @@ class ExpressionCodegen(
         get() = mv
     override val inlineNameGenerator: NameGenerator = NameGenerator("${classCodegen.type.internalName}\$todo")
 
-    override val lastLineNumber: Int
-        get() = -1 //TODO
+    override var lastLineNumber: Int = -1
 
     override fun consumeReifiedOperationMarker(typeParameterDescriptor: TypeParameterDescriptor) {
         //TODO
@@ -1147,7 +1206,12 @@ class ExpressionCodegen(
     private fun markNewLabel() = Label().apply { mv.visitLabel(this) }
 
     private fun IrElement.markLineNumber(startOffset: Boolean) {
-        mv.visitLineNumber(fileEntry.getLineNumber(if (startOffset) this.startOffset else endOffset) + 1, markNewLabel())
+        val lineNumber = fileEntry.getLineNumber(if (startOffset) this.startOffset else endOffset) + 1
+        if (lastLineNumber == lineNumber) {
+            return
+        }
+        lastLineNumber = lineNumber
+        mv.visitLineNumber(lineNumber, markNewLabel())
     }
 }
 

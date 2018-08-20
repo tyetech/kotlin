@@ -44,11 +44,11 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
     private static final Pattern TEST_LINE_NUMBER_PATTERN = Pattern.compile("^.*test." + LINE_NUMBER_FUN + "\\(\\).*$");
 
     @NotNull
-    private KotlinCoreEnvironment createEnvironment() {
+    protected KotlinCoreEnvironment createEnvironment(boolean setup) {
         return KotlinCoreEnvironment.createForTests(
                 myTestRootDisposable,
                 KotlinTestUtils.newConfiguration(
-                        ConfigurationKind.JDK_ONLY, TestJdkKind.MOCK_JDK, KotlinTestUtils.getAnnotationsJar(), tmpdir
+                        ConfigurationKind.ALL, TestJdkKind.MOCK_JDK, KotlinTestUtils.getAnnotationsJar(), tmpdir
                 ),
                 EnvironmentConfigFiles.JVM_CONFIG_FILES
         );
@@ -58,7 +58,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
     public void setUp() throws Exception {
         super.setUp();
 
-        KotlinCoreEnvironment environment = createEnvironment();
+        KotlinCoreEnvironment environment = createEnvironment(true);
         KtFile psiFile = KotlinTestUtils.createFile(
                 LINE_NUMBER_FUN + ".kt",
                 "package test;\n\npublic fun " + LINE_NUMBER_FUN + "(): Int = 0\n",
@@ -71,7 +71,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
     @NotNull
     private Pair<KtFile, KotlinCoreEnvironment> createPsiFile(@NotNull String filename) {
         File file = new File(filename);
-        KotlinCoreEnvironment environment = createEnvironment();
+        KotlinCoreEnvironment environment = createEnvironment(false);
 
         String text;
         try {
@@ -93,10 +93,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
 
         try {
             if (custom) {
-                List<String> actualLineNumbers = extractActualLineNumbersFromBytecode(classFileFactory, false);
-                String text = psiFile.getText();
-                String newFileText = text.substring(0, text.indexOf("// ")) + getActualLineNumbersAsString(actualLineNumbers);
-                KotlinTestUtils.assertEqualsToFile(new File(filename), newFileText);
+                compareCustom(filename, psiFile, classFileFactory);
             }
             else {
                 List<String> expectedLineNumbers = extractSelectedLineNumbersFromSource(psiFile);
@@ -110,12 +107,19 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
 
     }
 
+    protected void compareCustom(@NotNull String filename, KtFile psiFile, ClassFileFactory classFileFactory) {
+        List<String> actualLineNumbers = extractActualLineNumbersFromBytecode(classFileFactory, false);
+        String text = psiFile.getText();
+        String newFileText = text.substring(0, text.indexOf("\n// ") + 1) + getActualLineNumbersAsString(actualLineNumbers);
+        KotlinTestUtils.assertEqualsToFile(new File(filename), newFileText);
+    }
+
     private static String getActualLineNumbersAsString(List<String> lines) {
         return CollectionsKt.joinToString(lines, " ", "// ", "", -1, "...", lineNumber -> lineNumber);
     }
 
     @NotNull
-    private static List<String> extractActualLineNumbersFromBytecode(@NotNull ClassFileFactory factory, boolean testFunInvoke) {
+    protected List<String> extractActualLineNumbersFromBytecode(@NotNull ClassFileFactory factory, boolean testFunInvoke) {
         List<String> actualLineNumbers = Lists.newArrayList();
         for (OutputFile outputFile : ClassFileUtilsKt.getClassFiles(factory)) {
             ClassReader cr = new ClassReader(outputFile.asByteArray());
@@ -141,7 +145,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
     }
 
     @NotNull
-    private static List<String> extractSelectedLineNumbersFromSource(@NotNull KtFile file) {
+    protected List<String> extractSelectedLineNumbersFromSource(@NotNull KtFile file) {
         String fileContent = file.getText();
         List<String> lineNumbers = Lists.newArrayList();
         String[] lines = StringUtil.convertLineSeparators(fileContent).split("\n");
@@ -157,7 +161,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
     }
 
     @NotNull
-    private static List<String> readTestFunLineNumbers(@NotNull ClassReader cr) {
+    protected List<String> readTestFunLineNumbers(@NotNull ClassReader cr) {
         List<Label> labels = Lists.newArrayList();
         Map<Label, String> labels2LineNumbers = new HashMap<>();
 
@@ -166,6 +170,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
             public MethodVisitor visitMethod(int access, @NotNull String name, @NotNull String desc, String signature, String[] exceptions) {
                 return new MethodVisitor(Opcodes.ASM5) {
                     private Label lastLabel;
+                    private int lastLine = -1;
 
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
@@ -173,17 +178,21 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
                             assert lastLabel != null : "A function call with no preceding label";
                             labels.add(lastLabel);
                         }
-                        lastLabel = null;
                     }
 
                     @Override
                     public void visitLabel(@NotNull Label label) {
+                        if (!labels2LineNumbers.containsKey(lastLabel) && lastLine >= 0) {
+                            // Inherited line number
+                            labels2LineNumbers.put(lastLabel, Integer.toString(lastLine));
+                        }
                         lastLabel = label;
                     }
 
                     @Override
                     public void visitLineNumber(int line, @NotNull Label start) {
                         labels2LineNumbers.put(start, Integer.toString(line));
+                        lastLine = line;
                     }
                 };
             }
@@ -202,7 +211,7 @@ public abstract class AbstractLineNumberTest extends TestCaseWithTmpdir {
     }
 
     @NotNull
-    private static List<String> readAllLineNumbers(@NotNull ClassReader reader) {
+    protected List<String> readAllLineNumbers(@NotNull ClassReader reader) {
         List<String> result = new ArrayList<>();
         Set<String> visitedLabels = new HashSet<>();
 
