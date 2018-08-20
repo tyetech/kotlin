@@ -101,15 +101,13 @@ internal abstract class KotlinSourceSetProcessor<T : AbstractKotlinCompile<*>>(
         if (javaSourceSet == null)
             return
 
-        val kotlinDirSets = kotlinCompilation.kotlinSourceSets.map(KotlinSourceSet::kotlin)
-
-        // Try to avoid duplicate Java sources in allSource:
-        val kotlinSrcDirsToAdd = kotlinDirSets.map { filterOutJavaSrcDirsIfPossible(it) }
-
-        kotlinSrcDirsToAdd.forEach { kotlinSrcDirs ->
-            javaSourceSet.allJava.srcDirs(kotlinSrcDirs)
-            javaSourceSet.allSource.srcDirs(kotlinSrcDirs)
+        // Try to avoid duplicate Java sources in allSource; run lazily to allow changing the directory set:
+        val kotlinSrcDirsToAdd = Callable {
+            kotlinCompilation.kotlinSourceSets.map { filterOutJavaSrcDirsIfPossible(it.kotlin) }
         }
+
+        javaSourceSet.allJava.srcDirs(kotlinSrcDirsToAdd)
+        javaSourceSet.allSource.srcDirs(kotlinSrcDirsToAdd)
     }
 
     private fun filterOutJavaSrcDirsIfPossible(sourceDirectorySet: SourceDirectorySet): FileCollection {
