@@ -38,7 +38,7 @@ final class DeepNoinlineWithLabelsKt$foo$1$1 : kotlin/jvm/internal/Lambda, kotli
 final class DeepNoinlineWithLabelsKt$foo$1 : kotlin/jvm/internal/Lambda, kotlin/jvm/functions/Function1 {
     final int $count
 
-    final java.lang.String $this@foo
+    final java.lang.String $this_foo
 
     final boolean $x
 
@@ -60,10 +60,10 @@ public final class DeepNoinlineWithLabelsKt : java/lang/Object {
             0 block: Lkotlin/jvm/functions/Function1;
     }
 
-    public final static void foo(java.lang.String x, int this@foo) {
+    public final static void foo(java.lang.String x, int this_foo) {
         Local variables:
             2 x: Z
-            0 this@foo: Ljava/lang/String;
+            0 this_foo: Ljava/lang/String;
             1 count: I
     }
 }

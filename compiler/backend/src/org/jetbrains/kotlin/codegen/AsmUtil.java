@@ -94,7 +94,7 @@ public class AsmUtil {
 
     public static final String THIS = "this";
 
-    public static final String LABELED_THIS = THIS + "@";
+    public static final String LABELED_THIS = THIS + "_";
 
     public static final String CAPTURED_THIS_FIELD = getCapturedFieldName(THIS);
 

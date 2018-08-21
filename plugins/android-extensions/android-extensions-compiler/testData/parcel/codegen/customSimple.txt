@@ -27,7 +27,7 @@ final class User$Companion : java/lang/Object, kotlinx/android/parcel/Parceler {
           ARETURN
     }
 
-    public void write(User this@write, android.os.Parcel parcel, int flags)
+    public void write(User this_write, android.os.Parcel parcel, int flags)
 
     public void write(java.lang.Object p0, android.os.Parcel p1, int p2)
 }
