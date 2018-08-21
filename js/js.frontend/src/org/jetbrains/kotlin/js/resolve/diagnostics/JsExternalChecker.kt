@@ -39,22 +39,23 @@ object JsExternalChecker : DeclarationChecker {
             }
         }
 
-        if (DescriptorUtils.isAnnotationClass(descriptor)) {
-            trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "annotation class"))
+        if (descriptor is ClassDescriptor) {
+            val classKind = when {
+                descriptor.isData -> "data class"
+                descriptor.isInner -> "inner class"
+                descriptor.isInline -> "inline class"
+                DescriptorUtils.isAnnotationClass(descriptor) -> "annotation class"
+                else -> null
+            }
+
+            if (classKind != null) {
+                trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, classKind))
+            }
         }
-        else if (descriptor is ClassDescriptor && descriptor.isData) {
-            trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "data class"))
-        }
-        else if (descriptor is PropertyAccessorDescriptor && isDirectlyExternal(declaration, descriptor)) {
+
+        if (descriptor is PropertyAccessorDescriptor && isDirectlyExternal(declaration, descriptor)) {
             trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "property accessor"))
-        }
-        else if (descriptor is ClassDescriptor && descriptor.isInner) {
-            trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "inner class"))
-        }
-        else if (descriptor is ClassDescriptor && descriptor.isInline) {
-            trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "inline class"))
-        }
-        else if (isPrivateMemberOfExternalClass(descriptor)) {
+        } else if (isPrivateMemberOfExternalClass(descriptor)) {
             trace.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "private member of class"))
         }
 
