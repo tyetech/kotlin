@@ -29,10 +29,7 @@ import org.jetbrains.kotlin.load.java.JavaVisibilities;
 import org.jetbrains.kotlin.load.java.JvmAnnotationNames;
 import org.jetbrains.kotlin.metadata.jvm.deserialization.JvmProtoBufUtil;
 import org.jetbrains.kotlin.metadata.jvm.serialization.JvmStringTable;
-import org.jetbrains.kotlin.name.ClassId;
-import org.jetbrains.kotlin.name.FqName;
-import org.jetbrains.kotlin.name.Name;
-import org.jetbrains.kotlin.name.SpecialNames;
+import org.jetbrains.kotlin.name.*;
 import org.jetbrains.kotlin.protobuf.MessageLite;
 import org.jetbrains.kotlin.renderer.DescriptorRenderer;
 import org.jetbrains.kotlin.resolve.BindingContext;
@@ -123,16 +120,12 @@ public class AsmUtil {
     }
 
     public static String getCapturedFieldName(String originalName) {
-        if (originalName.startsWith("$")) {
-            return originalName;
-        }
-
         return "$" + originalName;
     }
 
     public static String getLabeledThisNameForCallable(@NotNull CallableDescriptor descriptor, @NotNull BindingContext bindingContext) {
         Name callableName = descriptor.getName();
-        if (callableName == SpecialNames.NO_NAME_PROVIDED || callableName == SpecialNames.ANONYMOUS_FUNCTION) {
+        if (!NameUtils.hasName(callableName)) {
             // THIS is already reserved for the instance 'this' parameter
             return CAPTURED_THIS_FIELD;
         }
@@ -153,7 +146,7 @@ public class AsmUtil {
     }
 
     private static String getLabeledThisName(@NotNull Name label) {
-        if (label == SpecialNames.NO_NAME_PROVIDED || label == SpecialNames.ANONYMOUS_FUNCTION) {
+        if (!NameUtils.hasName(label)) {
             return THIS;
         }
 
