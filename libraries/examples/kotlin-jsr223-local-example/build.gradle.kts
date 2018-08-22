@@ -8,7 +8,7 @@ plugins {
 dependencies {
     compile(project(":kotlin-stdlib"))
     compile(project(":kotlin-script-runtime"))
-    compile(projectRuntimeJar(":kotlin-compiler-embeddable"))
+    compile(project(":kotlin-compiler-embeddable"))
     compile(project(":kotlin-script-util"))
     testCompile(project(":kotlin-test:kotlin-test-junit"))
     testCompile(commonDep("junit:junit"))

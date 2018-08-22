@@ -77,7 +77,7 @@ dependencies {
     testCompile(project(":kotlin-scripting-compiler"))
     testCompile(project(":kotlin-scripting-misc"))
     testCompile(project(":kotlin-script-util"))
-    testCompileOnly(projectRuntimeJar(":kotlin-daemon-client"))
+    testCompileOnly(project(":kotlin-daemon-client"))
     testCompileOnly(project(":kotlin-reflect-api"))
     otherCompilerModules.forEach {
         testCompileOnly(project(it))

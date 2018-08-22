@@ -10,7 +10,7 @@ dependencies {
     compile(project(":kotlin-stdlib"))
     compile(project(":kotlin-reflect"))
     compileOnly(project(":compiler:util"))
-    runtime(projectRuntimeJar(":kotlin-compiler"))
+    runtime(project(":kotlin-compiler"))
     testCompile(commonDep("junit"))
 }
 

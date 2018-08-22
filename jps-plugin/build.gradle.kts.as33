@@ -11,10 +11,10 @@ dependencies {
     compile(project(":core:descriptors.jvm"))
     compile(project(":kotlin-compiler-runner"))
     compile(project(":compiler:daemon-common"))
-    compile(projectRuntimeJar(":kotlin-daemon-client"))
+    compile(project(":kotlin-daemon-client"))
     compile(project(":compiler:frontend.java"))
     compile(project(":js:js.frontend"))
-    compile(projectRuntimeJar(":kotlin-preloader"))
+    compile(project(":kotlin-preloader"))
     compile(project(":idea:idea-jps-common"))
     compileOnly(group = "org.jetbrains", name = "annotations", version = "13.0")
     compileOnly(intellijDep()) { includeJars("jdom", "trove4j", "jps-model", "openapi", "platform-api", "util", "asm-all") }

@@ -25,7 +25,7 @@ dependencies {
     projectsToShadow.forEach {
         embeddedComponents(project(it)) { isTransitive = false }
     }
-    embeddedComponents(projectRuntimeJar(":kotlin-daemon-client"))
+    embeddedComponents(project(":kotlin-daemon-client"))
 }
 
 runtimeJar<ShadowJar>(task<ShadowJar>("jar")) {
