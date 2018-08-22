@@ -58,8 +58,8 @@ public inline fun <T> Sequence<T>?.orEmpty(): Sequence<T> = this ?: emptySequenc
 
 
 /**
- * Returns the sequence that returns  if it's not empty
- * or the result of calling [defaultValue] function if the map is empty.
+ * Returns a sequence that iterates through the elements either of this sequence
+ * or, if this sequence turns out to be empty, of the sequence returned by [defaultValue] function.
  *
  * @sample samples.collections.Sequences.Usage.sequenceIfEmpty
  */

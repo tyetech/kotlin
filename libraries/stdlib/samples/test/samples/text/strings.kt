@@ -161,6 +161,7 @@ class Strings {
         val sameString = nonEmpty.ifEmpty { "def" }
         assertTrue(nonEmpty === sameString)
     }
+
     @Sample
     fun stringIfBlank() {
         val blank = "    "

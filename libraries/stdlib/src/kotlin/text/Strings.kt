@@ -288,7 +288,7 @@ public inline fun <C, R> C.ifEmpty(defaultValue: () -> R): R where C : CharSeque
     if (isEmpty()) defaultValue() else this
 
 /**
- * Returns this char sequence if it is not empty consists solely of whitespace characters
+ * Returns this char sequence if it is not empty and doesn't consist solely of whitespace characters,
  * or the result of calling [defaultValue] function otherwise.
  *
  * @sample samples.text.Strings.stringIfBlank
