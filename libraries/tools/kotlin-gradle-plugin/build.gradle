@@ -58,10 +58,10 @@ dependencies {
         }
     }
 
-    runtime project(path: ':kotlin-compiler-embeddable', configuration: "runtimeJar")
-    runtime project(path: ':kotlin-annotation-processing-gradle', configuration: "runtimeJar")
-    runtime project(path: ':kotlin-android-extensions', configuration: 'runtimeJar')
-    runtime project(path: ':kotlin-compiler-runner', configuration: 'runtimeJar')
+    runtime project(path: ':kotlin-compiler-embeddable')
+    runtime project(path: ':kotlin-annotation-processing-gradle')
+    runtime project(path: ':kotlin-android-extensions')
+    runtime project(path: ':kotlin-compiler-runner')
     runtime project(':kotlin-reflect')
 
     // com.android.tools.build:gradle has ~50 unneeded transitive dependencies
