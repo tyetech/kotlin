@@ -5572,54 +5572,126 @@ public expect fun BooleanArray.contentToString(): String
 @SinceKotlin("1.1")
 public expect fun CharArray.contentToString(): String
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun <T> Array<out T>.copyInto(destination: Array<T>, destinationIndex: Int = 0): Array<T> {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun ByteArray.copyInto(destination: ByteArray, destinationIndex: Int = 0): ByteArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun ShortArray.copyInto(destination: ShortArray, destinationIndex: Int = 0): ShortArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun IntArray.copyInto(destination: IntArray, destinationIndex: Int = 0): IntArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun LongArray.copyInto(destination: LongArray, destinationIndex: Int = 0): LongArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun FloatArray.copyInto(destination: FloatArray, destinationIndex: Int = 0): FloatArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun DoubleArray.copyInto(destination: DoubleArray, destinationIndex: Int = 0): DoubleArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun BooleanArray.copyInto(destination: BooleanArray, destinationIndex: Int = 0): BooleanArray {
     return copyRangeInto(destination, destinationIndex, 0, size)
 }
 
+/**
+ * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * 
+ * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 @kotlin.internal.InlineOnly
 public inline fun CharArray.copyInto(destination: CharArray, destinationIndex: Int = 0): CharArray {
@@ -5863,30 +5935,165 @@ public expect fun BooleanArray.copyOfRange(fromIndex: Int, toIndex: Int): Boolea
  */
 public expect fun CharArray.copyOfRange(fromIndex: Int, toIndex: Int): CharArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun <T> Array<out T>.copyRangeInto(destination: Array<T>, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): Array<T>
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun ByteArray.copyRangeInto(destination: ByteArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): ByteArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun ShortArray.copyRangeInto(destination: ShortArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): ShortArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun IntArray.copyRangeInto(destination: IntArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): IntArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun LongArray.copyRangeInto(destination: LongArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): LongArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun FloatArray.copyRangeInto(destination: FloatArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): FloatArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun DoubleArray.copyRangeInto(destination: DoubleArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): DoubleArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun BooleanArray.copyRangeInto(destination: BooleanArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): BooleanArray
 
+/**
+ * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
+ * 
+ * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
+ * 
+ * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+ * 
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * or when that index is out of the [destination] array indices range.
+ * 
+ * @return the [destination] array.
+ */
 @SinceKotlin("1.3")
 public expect fun CharArray.copyRangeInto(destination: CharArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): CharArray
 
