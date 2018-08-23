@@ -226,9 +226,17 @@ public fun UShortArray.contentToString(): String {
 }
 
 /**
- * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * Copies this array or its subrange into the [destination] array and returns that array.
  * 
- * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @param destination the array to copy to.
+ * @param destinationOffset the position in the [destination] array to copy to, 0 by default.
+ * @param startIndex the beginning (inclusive) of the subrange to copy, 0 by default.
+ * @param endIndex the end (exclusive) of the subrange to copy, size of this array by default.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
  * or when that index is out of the [destination] array indices range.
  * 
  * @return the [destination] array.
@@ -236,14 +244,22 @@ public fun UShortArray.contentToString(): String {
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun UIntArray.copyInto(destination: UIntArray, destinationIndex: Int = 0): UIntArray {
-    return copyRangeInto(destination, destinationIndex, 0, size)
+public inline fun UIntArray.copyInto(destination: UIntArray, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = -1): UIntArray {
+    return UIntArray(storage.copyInto(destination.storage, destinationOffset, startIndex, endIndex))
 }
 
 /**
- * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * Copies this array or its subrange into the [destination] array and returns that array.
  * 
- * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @param destination the array to copy to.
+ * @param destinationOffset the position in the [destination] array to copy to, 0 by default.
+ * @param startIndex the beginning (inclusive) of the subrange to copy, 0 by default.
+ * @param endIndex the end (exclusive) of the subrange to copy, size of this array by default.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
  * or when that index is out of the [destination] array indices range.
  * 
  * @return the [destination] array.
@@ -251,14 +267,22 @@ public inline fun UIntArray.copyInto(destination: UIntArray, destinationIndex: I
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun ULongArray.copyInto(destination: ULongArray, destinationIndex: Int = 0): ULongArray {
-    return copyRangeInto(destination, destinationIndex, 0, size)
+public inline fun ULongArray.copyInto(destination: ULongArray, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = -1): ULongArray {
+    return ULongArray(storage.copyInto(destination.storage, destinationOffset, startIndex, endIndex))
 }
 
 /**
- * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * Copies this array or its subrange into the [destination] array and returns that array.
  * 
- * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @param destination the array to copy to.
+ * @param destinationOffset the position in the [destination] array to copy to, 0 by default.
+ * @param startIndex the beginning (inclusive) of the subrange to copy, 0 by default.
+ * @param endIndex the end (exclusive) of the subrange to copy, size of this array by default.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
  * or when that index is out of the [destination] array indices range.
  * 
  * @return the [destination] array.
@@ -266,14 +290,22 @@ public inline fun ULongArray.copyInto(destination: ULongArray, destinationIndex:
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun UByteArray.copyInto(destination: UByteArray, destinationIndex: Int = 0): UByteArray {
-    return copyRangeInto(destination, destinationIndex, 0, size)
+public inline fun UByteArray.copyInto(destination: UByteArray, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = -1): UByteArray {
+    return UByteArray(storage.copyInto(destination.storage, destinationOffset, startIndex, endIndex))
 }
 
 /**
- * Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
+ * Copies this array or its subrange into the [destination] array and returns that array.
  * 
- * @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
+ * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+ * 
+ * @param destination the array to copy to.
+ * @param destinationOffset the position in the [destination] array to copy to, 0 by default.
+ * @param startIndex the beginning (inclusive) of the subrange to copy, 0 by default.
+ * @param endIndex the end (exclusive) of the subrange to copy, size of this array by default.
+ * 
+ * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
+ * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
  * or when that index is out of the [destination] array indices range.
  * 
  * @return the [destination] array.
@@ -281,8 +313,8 @@ public inline fun UByteArray.copyInto(destination: UByteArray, destinationIndex:
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun UShortArray.copyInto(destination: UShortArray, destinationIndex: Int = 0): UShortArray {
-    return copyRangeInto(destination, destinationIndex, 0, size)
+public inline fun UShortArray.copyInto(destination: UShortArray, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = -1): UShortArray {
+    return UShortArray(storage.copyInto(destination.storage, destinationOffset, startIndex, endIndex))
 }
 
 /**
@@ -439,94 +471,6 @@ public inline fun UByteArray.copyOfRange(fromIndex: Int, toIndex: Int): UByteArr
 @kotlin.internal.InlineOnly
 public inline fun UShortArray.copyOfRange(fromIndex: Int, toIndex: Int): UShortArray {
     return UShortArray(storage.copyOfRange(fromIndex, toIndex))
-}
-
-/**
- * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
- * 
- * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
- * 
- * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
- * 
- * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
- * 
- * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
- * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
- * or when that index is out of the [destination] array indices range.
- * 
- * @return the [destination] array.
- */
-@SinceKotlin("1.3")
-@ExperimentalUnsignedTypes
-@kotlin.internal.InlineOnly
-public inline fun UIntArray.copyRangeInto(destination: UIntArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): UIntArray {
-    return UIntArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
-}
-
-/**
- * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
- * 
- * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
- * 
- * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
- * 
- * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
- * 
- * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
- * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
- * or when that index is out of the [destination] array indices range.
- * 
- * @return the [destination] array.
- */
-@SinceKotlin("1.3")
-@ExperimentalUnsignedTypes
-@kotlin.internal.InlineOnly
-public inline fun ULongArray.copyRangeInto(destination: ULongArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): ULongArray {
-    return ULongArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
-}
-
-/**
- * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
- * 
- * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
- * 
- * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
- * 
- * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
- * 
- * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
- * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
- * or when that index is out of the [destination] array indices range.
- * 
- * @return the [destination] array.
- */
-@SinceKotlin("1.3")
-@ExperimentalUnsignedTypes
-@kotlin.internal.InlineOnly
-public inline fun UByteArray.copyRangeInto(destination: UByteArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): UByteArray {
-    return UByteArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
-}
-
-/**
- * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
- * 
- * The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
- * 
- * [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
- * 
- * It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
- * 
- * @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
- * @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
- * or when that index is out of the [destination] array indices range.
- * 
- * @return the [destination] array.
- */
-@SinceKotlin("1.3")
-@ExperimentalUnsignedTypes
-@kotlin.internal.InlineOnly
-public inline fun UShortArray.copyRangeInto(destination: UShortArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): UShortArray {
-    return UShortArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
 }
 
 /**

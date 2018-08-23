@@ -465,31 +465,8 @@ object ArrayOps : TemplateGroupBase() {
         }
     }
 
-    val f_copyInto = fn("copyInto(destination: SELF, destinationIndex: Int = 0)") {
-        include(InvariantArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned)
-    } builder {
-        since("1.3")
-        returns("SELF")
-        inlineOnly()
-        doc {
-            """
-            Copies this array into the specified [destination] array starting at the specified [destinationIndex] (0 by default).
-
-            @throws [IndexOutOfBoundsException] when this array doesn't fit into the [destination] array starting at the specified [destinationIndex],
-            or when that index is out of the [destination] array indices range.
-
-            @return the [destination] array.
-            """
-        }
-        specialFor(InvariantArraysOfObjects) {
-            receiver("Array<out T>")
-        }
-        body {
-            "return copyRangeInto(destination, destinationIndex, 0, size)"
-        }
-    }
-
-    val f_copyRangeInto = fn("copyRangeInto(destination: SELF, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size)") {
+    // TODO: Remove -1 from common signature
+    val f_copyInto = fn("copyInto(destination: SELF, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = -1)") {
         include(InvariantArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned)
     } builder {
         since("1.3")
@@ -497,13 +474,14 @@ object ArrayOps : TemplateGroupBase() {
 
         doc {
             """
-            Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
-
-            The subrange of this array is specified with the [startIndex] (inclusive) and [endIndex] (exclusive) parameters.
-
-            [destinationIndex] specifies where to place the copy in the destination array, 0 by default.
+            Copies this array or its subrange into the [destination] array and returns that array.
 
             It's allowed to pass the same array in the [destination] and even specify the subrange so that it overlaps with the destination range.
+
+            @param destination the array to copy to.
+            @param destinationOffset the position in the [destination] array to copy to, 0 by default.
+            @param startIndex the beginning (inclusive) of the subrange to copy, 0 by default.
+            @param endIndex the end (exclusive) of the subrange to copy, size of this array by default.
 
             @throws [IndexOutOfBoundsException] or [IllegalArgumentException] when [startIndex] or [endIndex] is out of range of this array indices or when `startIndex > endIndex`.
             @throws [IndexOutOfBoundsException] when the subrange doesn't fit into the [destination] array starting at the specified [destinationIndex],
@@ -516,7 +494,7 @@ object ArrayOps : TemplateGroupBase() {
         specialFor(ArraysOfUnsigned) {
             inlineOnly()
             body {
-                "return SELF(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))"
+                "return SELF(storage.copyInto(destination.storage, destinationOffset, startIndex, endIndex))"
             }
         }
         specialFor(ArraysOfPrimitives, InvariantArraysOfObjects) {
@@ -525,20 +503,24 @@ object ArrayOps : TemplateGroupBase() {
             }
             on(Platform.JVM) {
                 suppress("ACTUAL_FUNCTION_WITH_DEFAULT_ARGUMENTS")
+                signature("copyInto(destination: SELF, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = size)")
                 body {
                     """
-                    System.arraycopy(this, startIndex, destination, destinationIndex, endIndex - startIndex)
+                    @Suppress("NAME_SHADOWING")
+                    val endIndex = if (endIndex == -1) size else endIndex // TODO: Remove when default value from expect is fixed
+                    System.arraycopy(this, startIndex, destination, destinationOffset, endIndex - startIndex)
                     return destination
                     """
                 }
             }
             on(Platform.JS) {
                 suppress("ACTUAL_FUNCTION_WITH_DEFAULT_ARGUMENTS")
+                signature("copyInto(destination: SELF, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = size)")
                 inlineOnly()
                 body {
                     val cast = ".unsafeCast<Array<$primitive>>()".takeIf { family == ArraysOfPrimitives } ?: ""
                     """
-                    arrayCopy(this$cast, destination$cast, destinationIndex, startIndex, endIndex)
+                    arrayCopy(this$cast, destination$cast, destinationOffset, startIndex, endIndex)
                     return destination
                     """
                 }

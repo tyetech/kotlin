@@ -126,20 +126,23 @@ internal actual fun <T> arrayOfNulls(reference: Array<T>, size: Int): Array<T> {
     return arrayOfNulls<Any>(size).unsafeCast<Array<T>>()
 }
 
-@PublishedApi
 @SinceKotlin("1.3")
-internal fun <T> arrayCopy(source: Array<out T>, destination: Array<in T>, destinationIndex: Int, startIndex: Int, endIndex: Int) {
+@PublishedApi
+@JsName("arrayCopy")
+internal fun <T> arrayCopy(source: Array<out T>, destination: Array<in T>, destinationOffset: Int, startIndex: Int, endIndex: Int) {
+    @Suppress("NAME_SHADOWING")
+    val endIndex = if (endIndex == -1) source.size else endIndex // TODO: Remove when default value from expect is fixed
     AbstractList.checkRangeIndexes(startIndex, endIndex, source.size)
     val rangeSize = endIndex - startIndex
-    AbstractList.checkRangeIndexes(destinationIndex, destinationIndex + rangeSize, destination.size)
+    AbstractList.checkRangeIndexes(destinationOffset, destinationOffset + rangeSize, destination.size)
 
-    if (source !== destination || destinationIndex <= startIndex) {
+    if (source !== destination || destinationOffset <= startIndex) {
         for (index in 0 until rangeSize) {
-            destination[destinationIndex + index] = source[startIndex + index]
+            destination[destinationOffset + index] = source[startIndex + index]
         }
     } else {
         for (index in rangeSize - 1 downTo 0) {
-            destination[destinationIndex + index] = source[startIndex + index]
+            destination[destinationOffset + index] = source[startIndex + index]
         }
     }
 }
