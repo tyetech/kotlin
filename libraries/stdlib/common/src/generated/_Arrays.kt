@@ -5951,7 +5951,7 @@ public expect fun CharArray.copyOfRange(fromIndex: Int, toIndex: Int): CharArray
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun <T> Array<out T>.copyRangeInto(destination: Array<T>, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): Array<T>
+public expect fun <T> Array<out T>.copyRangeInto(destination: Array<T>, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): Array<T>
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -5969,7 +5969,7 @@ public expect fun <T> Array<out T>.copyRangeInto(destination: Array<T>, destinat
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun ByteArray.copyRangeInto(destination: ByteArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): ByteArray
+public expect fun ByteArray.copyRangeInto(destination: ByteArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): ByteArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -5987,7 +5987,7 @@ public expect fun ByteArray.copyRangeInto(destination: ByteArray, destinationInd
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun ShortArray.copyRangeInto(destination: ShortArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): ShortArray
+public expect fun ShortArray.copyRangeInto(destination: ShortArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): ShortArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -6005,7 +6005,7 @@ public expect fun ShortArray.copyRangeInto(destination: ShortArray, destinationI
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun IntArray.copyRangeInto(destination: IntArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): IntArray
+public expect fun IntArray.copyRangeInto(destination: IntArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): IntArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -6023,7 +6023,7 @@ public expect fun IntArray.copyRangeInto(destination: IntArray, destinationIndex
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun LongArray.copyRangeInto(destination: LongArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): LongArray
+public expect fun LongArray.copyRangeInto(destination: LongArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): LongArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -6041,7 +6041,7 @@ public expect fun LongArray.copyRangeInto(destination: LongArray, destinationInd
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun FloatArray.copyRangeInto(destination: FloatArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): FloatArray
+public expect fun FloatArray.copyRangeInto(destination: FloatArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): FloatArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -6059,7 +6059,7 @@ public expect fun FloatArray.copyRangeInto(destination: FloatArray, destinationI
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun DoubleArray.copyRangeInto(destination: DoubleArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): DoubleArray
+public expect fun DoubleArray.copyRangeInto(destination: DoubleArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): DoubleArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -6077,7 +6077,7 @@ public expect fun DoubleArray.copyRangeInto(destination: DoubleArray, destinatio
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun BooleanArray.copyRangeInto(destination: BooleanArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): BooleanArray
+public expect fun BooleanArray.copyRangeInto(destination: BooleanArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): BooleanArray
 
 /**
  * Copies the specified subrange of this array into the [destination] array starting at the specified [destinationIndex].
@@ -6095,7 +6095,7 @@ public expect fun BooleanArray.copyRangeInto(destination: BooleanArray, destinat
  * @return the [destination] array.
  */
 @SinceKotlin("1.3")
-public expect fun CharArray.copyRangeInto(destination: CharArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): CharArray
+public expect fun CharArray.copyRangeInto(destination: CharArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): CharArray
 
 /**
  * Returns the range of valid indices for the array.

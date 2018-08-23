@@ -459,7 +459,7 @@ public inline fun UShortArray.copyOfRange(fromIndex: Int, toIndex: Int): UShortA
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun UIntArray.copyRangeInto(destination: UIntArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): UIntArray {
+public inline fun UIntArray.copyRangeInto(destination: UIntArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): UIntArray {
     return UIntArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
 }
 
@@ -481,7 +481,7 @@ public inline fun UIntArray.copyRangeInto(destination: UIntArray, destinationInd
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun ULongArray.copyRangeInto(destination: ULongArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): ULongArray {
+public inline fun ULongArray.copyRangeInto(destination: ULongArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): ULongArray {
     return ULongArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
 }
 
@@ -503,7 +503,7 @@ public inline fun ULongArray.copyRangeInto(destination: ULongArray, destinationI
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun UByteArray.copyRangeInto(destination: UByteArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): UByteArray {
+public inline fun UByteArray.copyRangeInto(destination: UByteArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): UByteArray {
     return UByteArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
 }
 
@@ -525,7 +525,7 @@ public inline fun UByteArray.copyRangeInto(destination: UByteArray, destinationI
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
-public inline fun UShortArray.copyRangeInto(destination: UShortArray, destinationIndex: Int = 0, startIndex: Int, endIndex: Int): UShortArray {
+public inline fun UShortArray.copyRangeInto(destination: UShortArray, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size): UShortArray {
     return UShortArray(storage.copyRangeInto(destination.storage, destinationIndex, startIndex, endIndex))
 }
 

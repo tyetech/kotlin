@@ -489,7 +489,7 @@ object ArrayOps : TemplateGroupBase() {
         }
     }
 
-    val f_copyRangeInto = fn("copyRangeInto(destination: SELF, destinationIndex: Int = 0, startIndex: Int, endIndex: Int)") {
+    val f_copyRangeInto = fn("copyRangeInto(destination: SELF, destinationIndex: Int = 0, startIndex: Int = 0, endIndex: Int = this.size)") {
         include(InvariantArraysOfObjects, ArraysOfPrimitives, ArraysOfUnsigned)
     } builder {
         since("1.3")
