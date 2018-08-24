@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.gradle.utils.isGradleVersionAtLeast
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.HostManager
+import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 import java.util.*
 import java.util.concurrent.Callable
@@ -329,7 +330,7 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
     }
 }
 
-open class KotlinTargetConfigurator<KotlinCompilationType: KotlinCompilation>(
+open class KotlinTargetConfigurator<KotlinCompilationType : KotlinCompilation>(
     buildOutputCleanupRegistry: BuildOutputCleanupRegistry
 ) : AbstractKotlinTargetConfigurator<KotlinOnlyTarget<KotlinCompilationType>>(buildOutputCleanupRegistry) {
 
@@ -382,7 +383,7 @@ open class KotlinTargetConfigurator<KotlinCompilationType: KotlinCompilation>(
         publications.attributes.attribute(ArtifactAttributes.ARTIFACT_FORMAT, ArtifactTypeDefinition.JAR_TYPE)
     }
 
-    private fun setCompatibilityOfAbstractCompileTasks(project: Project) = with (project) {
+    private fun setCompatibilityOfAbstractCompileTasks(project: Project) = with(project) {
         tasks.withType(AbstractKotlinCompile::class.java).all {
             // Workaround: these are input properties and should not hold null values:
             it.targetCompatibility = ""
@@ -462,7 +463,9 @@ open class KotlinNativeTargetConfigurator(
             var filename = "$prefix$baseName$suffix"
             if (outputKind == CompilerOutputKind.FRAMEWORK ||
                 outputKind == CompilerOutputKind.STATIC ||
-                outputKind == CompilerOutputKind.DYNAMIC) {
+                outputKind == CompilerOutputKind.DYNAMIC ||
+                outputKind == CompilerOutputKind.PROGRAM && konanTarget == KonanTarget.WASM32
+            ) {
                 filename = filename.replace('-', '_')
             }
 
@@ -587,7 +590,7 @@ open class KotlinNativeTargetConfigurator(
         }
     }
 
-    override fun configureArchivesAndComponent(target: KotlinNativeTarget) : Unit = with(target.project) {
+    override fun configureArchivesAndComponent(target: KotlinNativeTarget): Unit = with(target.project) {
         tasks.create(target.artifactsTaskName)
         target.compilations.all {
             createKlibCompilationTask(it)
