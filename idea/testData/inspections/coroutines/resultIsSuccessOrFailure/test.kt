@@ -4,7 +4,7 @@ class SuccessOrFailure<T>(val value: T?) {
     fun getOrThrow(): T = value ?: throw AssertionError("")
 }
 // YES
-fun getSuccess() = SuccessOrFailure("123")
+fun getSuccess() = success()
 // YES
 fun getSuccessExplicit(): SuccessOrFailure<Int> = SuccessOrFailure(456)
 // NO (noCatching available)
@@ -14,7 +14,7 @@ fun correct() = true
 // YES
 fun incorrectCatching() = SuccessOrFailure(3.14)
 // YES
-fun strangeCatching() = SuccessOrFailure(false)
+fun strangeCatching() = runCatching { false }
 // YES
 fun strange() = 1
 
@@ -41,3 +41,23 @@ fun test() {
     // NO yet
     fun localCatching() = SuccessOrFailure(2.72)
 }
+
+// NO (stdlib)
+fun success() = SuccessOrFailure(true)
+// NO (stdlib)
+fun failure() = SuccessOrFailure(false)
+// NO (stdlib)
+fun <T> runCatching(block: () -> T) = SuccessOrFailure(block())
+// NO (stdlib)
+fun <T> SuccessOrFailure<T>.id() = this
+
+class ClassWithExtension() {
+    // NO (not SuccessOrFailure)
+    fun calc() = 12345
+    // NO (not SuccessOrFailure)
+    fun calcComplex(arg1: Int, arg2: Double): Double = arg1 + arg2
+    // YES (different parameters)
+    fun calcComplexCatching() = SuccessOrFailure(0.0)
+}
+// NO (extension to calc)
+fun ClassWithExtension.calcCatching() = SuccessOrFailure(calc())
