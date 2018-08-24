@@ -124,22 +124,22 @@ public class AsmUtil {
     }
 
     public static String getLabeledThisNameForCallable(@NotNull CallableDescriptor descriptor, @NotNull BindingContext bindingContext) {
-        Name callableName = descriptor.getName();
-        if (!NameUtils.hasName(callableName)) {
-            // THIS is already reserved for the instance 'this' parameter
-            return CAPTURED_THIS_FIELD;
-        }
-
         if (descriptor instanceof FunctionDescriptor) {
             String labelName = bindingContext.get(CodegenBinding.CALL_LABEL_FOR_LAMBDA_ARGUMENT, (FunctionDescriptor) descriptor);
             if (labelName != null) {
-                return LABELED_THIS + labelName;
+                return getLabeledThisName(labelName);
             }
 
             if (descriptor instanceof VariableAccessorDescriptor) {
                 VariableAccessorDescriptor accessor = (VariableAccessorDescriptor) descriptor;
                 return getLabeledThisName(accessor.getCorrespondingVariable().getName());
             }
+        }
+
+        Name callableName = descriptor.getName();
+        if (!NameUtils.hasName(callableName)) {
+            // THIS is already reserved for the instance 'this' parameter
+            return CAPTURED_THIS_FIELD;
         }
 
         return getLabeledThisName(callableName);

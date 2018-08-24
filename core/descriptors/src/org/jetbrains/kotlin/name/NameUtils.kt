@@ -52,5 +52,5 @@ object NameUtils {
             Name.identifier(NameUtils.getPackagePartClassNamePrefix(filePath.substringAfterLast('/').substringBeforeLast('.')))
 
     @JvmStatic
-    fun hasName(name: Name) = name == SpecialNames.NO_NAME_PROVIDED || name == SpecialNames.ANONYMOUS_FUNCTION
+    fun hasName(name: Name) = name != SpecialNames.NO_NAME_PROVIDED && name != SpecialNames.ANONYMOUS_FUNCTION
 }
