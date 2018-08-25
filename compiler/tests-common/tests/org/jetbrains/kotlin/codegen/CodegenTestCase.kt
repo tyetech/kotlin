@@ -76,7 +76,7 @@ abstract class CodegenTestCase : KtUsefulTestCase() {
     @JvmField
     protected var additionalDependencies: List<File>? = null
     @JvmField
-    protected var coroutinesPackage: String? = null
+    protected var coroutinesPackage: String = ""
 
     @JvmField
     protected var configurationKind = ConfigurationKind.JDK_ONLY
@@ -91,11 +91,11 @@ abstract class CodegenTestCase : KtUsefulTestCase() {
     protected val classPathURLs: Array<URL>
         get() {
             val files = ArrayList<File>()
-            if (javaClassesOutputDirectory != null) {
-                files.add(javaClassesOutputDirectory!!)
+            javaClassesOutputDirectory?.let {
+                files.add(it)
             }
-            if (additionalDependencies != null) {
-                files.addAll(additionalDependencies!!)
+            additionalDependencies?.let {
+                files.addAll(it)
             }
 
             val externalImportsProvider = ScriptDependenciesProvider.getInstance(myEnvironment!!.project)
@@ -114,12 +114,11 @@ abstract class CodegenTestCase : KtUsefulTestCase() {
 
         }
 
-    protected val classBuilderFactory: ClassBuilderFactory
-        get() = ClassBuilderFactories.TEST
+    protected open val classBuilderFactory = ClassBuilderFactories.TEST
 
     protected fun createEnvironmentWithMockJdkAndIdeaAnnotations(
         configurationKind: ConfigurationKind,
-        vararg javaSourceRoots: File
+        vararg javaSourceRoots: File?
     ) {
         createEnvironmentWithMockJdkAndIdeaAnnotations(configurationKind, emptyList(), TestJdkKind.MOCK_JDK, *javaSourceRoots)
     }
@@ -128,7 +127,7 @@ abstract class CodegenTestCase : KtUsefulTestCase() {
         configurationKind: ConfigurationKind,
         testFilesWithConfigurationDirectives: List<TestFile>,
         testJdkKind: TestJdkKind,
-        vararg javaSourceRoots: File
+        vararg javaSourceRoots: File?
     ) {
         if (myEnvironment != null) {
             throw IllegalStateException("must not set up myEnvironment twice")

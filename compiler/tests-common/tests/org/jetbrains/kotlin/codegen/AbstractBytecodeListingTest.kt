@@ -17,7 +17,7 @@ abstract class AbstractBytecodeListingTest : CodegenTestCase() {
     override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?) {
 
         compile(files, javaFilesDir)
-        val actualTxt = BytecodeListingTextCollectingVisitor.getText(classFileFactory, withSignatures = isWithSignatures(wholeFile))
+        val actualTxt = BytecodeListingTextCollectingVisitor.getText(classFileFactory!!, withSignatures = isWithSignatures(wholeFile))
 
         val prefixes =
             if (coroutinesPackage == DescriptorUtils.COROUTINES_PACKAGE_FQ_NAME_RELEASE.asString()) {

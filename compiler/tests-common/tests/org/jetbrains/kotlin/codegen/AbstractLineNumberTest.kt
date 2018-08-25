@@ -29,25 +29,22 @@ import java.util.regex.Pattern
 abstract class AbstractLineNumberTest : CodegenTestCase() {
 
     override fun doMultiFileTest(
-        wholeFile: File, files: MutableList<CodegenTestCase.TestFile>, javaFilesDir: File?
+        wholeFile: File, files: List<CodegenTestCase.TestFile>, javaFilesDir: File?
     ) {
         val isCustomTest = wholeFile.parentFile.name.equals("custom", ignoreCase = true)
-        if (!isCustomTest) {
-            files.add(createLineNumberDeclaration())
-        }
-        compile(files, javaFilesDir)
+        compile(if (isCustomTest) files else files + createLineNumberDeclaration(), javaFilesDir)
 
-        val psiFile = myFiles.psiFiles.single { file -> file.name == wholeFile.name }
+        val psiFile = myFiles!!.psiFiles.single { file -> file.name == wholeFile.name }
 
         try {
             if (isCustomTest) {
-                val actualLineNumbers = extractActualLineNumbersFromBytecode(classFileFactory, false)
+                val actualLineNumbers = extractActualLineNumbersFromBytecode(classFileFactory!!, false)
                 val text = psiFile.text
                 val newFileText = text.substringBefore("// ") + getActualLineNumbersAsString(actualLineNumbers)
                 KotlinTestUtils.assertEqualsToFile(wholeFile, newFileText)
             } else {
                 val expectedLineNumbers = extractSelectedLineNumbersFromSource(psiFile)
-                val actualLineNumbers = extractActualLineNumbersFromBytecode(classFileFactory, true)
+                val actualLineNumbers = extractActualLineNumbersFromBytecode(classFileFactory!!, true)
                 assertFalse("Missed 'lineNumbers' calls in test data", expectedLineNumbers.isEmpty())
                 KtUsefulTestCase.assertSameElements(actualLineNumbers, expectedLineNumbers)
             }

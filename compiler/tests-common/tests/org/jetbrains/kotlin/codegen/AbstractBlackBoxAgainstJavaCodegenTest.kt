@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.test.ConfigurationKind
 import java.io.File
 
 abstract class AbstractBlackBoxAgainstJavaCodegenTest : AbstractBlackBoxCodegenTest() {
-    override fun doMultiFileTest(wholeFile: File, files: MutableList<TestFile>, javaFilesDir: File?) {
+    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?) {
         javaClassesOutputDirectory = javaFilesDir!!.let { directory ->
             CodegenTestUtil.compileJava(CodegenTestUtil.findJavaSourcesInDirectory(directory), emptyList(), extractJavacOptions(files))
         }
@@ -31,10 +31,10 @@ abstract class AbstractBlackBoxAgainstJavaCodegenTest : AbstractBlackBoxCodegenT
     }
 
     override fun updateConfiguration(configuration: CompilerConfiguration) {
-        configuration.addJvmClasspathRoot(javaClassesOutputDirectory)
+        configuration.addJvmClasspathRoot(javaClassesOutputDirectory!!)
     }
 
-    override fun extractConfigurationKind(files: MutableList<TestFile>): ConfigurationKind {
+    override fun extractConfigurationKind(files: List<TestFile>): ConfigurationKind {
         return ConfigurationKind.ALL
     }
 }

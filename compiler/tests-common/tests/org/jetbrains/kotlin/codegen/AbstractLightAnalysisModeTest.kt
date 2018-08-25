@@ -69,12 +69,12 @@ abstract class AbstractLightAnalysisModeTest : CodegenTestCase() {
             javaSourceDir: File?
     ): String {
         compile(files, javaSourceDir)
-        classFileFactory.getClassFiles()
+        classFileFactory!!.getClassFiles()
 
-        val classInternalNames = classFileFactory.generationState.bindingContext
+        val classInternalNames = classFileFactory!!.generationState.bindingContext
                 .getSliceContents(CodegenBinding.ASM_TYPE).map { it.value.internalName to it.key }.toMap()
 
-        return BytecodeListingTextCollectingVisitor.getText(classFileFactory, object : ListAnalysisFilter() {
+        return BytecodeListingTextCollectingVisitor.getText(classFileFactory!!, object : ListAnalysisFilter() {
             override fun shouldWriteClass(access: Int, name: String): Boolean {
                 val classDescriptor = classInternalNames[name]
                 if (classDescriptor != null && shouldFilterClass(classDescriptor)) {

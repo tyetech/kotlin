@@ -19,7 +19,7 @@ abstract class AbstractDumpDeclarationsTest : CodegenTestCase() {
         val expectedResult = KotlinTestUtils.replaceExtension(wholeFile, "json")
         dumpToFile = KotlinTestUtils.tmpDirForTest(this).resolve(name + ".json")
         compile(files, null)
-        classFileFactory.generationState.destroy()
+        classFileFactory!!.generationState.destroy()
         KotlinTestUtils.assertEqualsToFile(expectedResult, dumpToFile.readText()) {
             it.replace("COROUTINES_PACKAGE", coroutinesPackage)
         }
@@ -29,7 +29,7 @@ abstract class AbstractDumpDeclarationsTest : CodegenTestCase() {
         configuration.put(JVMConfigurationKeys.DECLARATIONS_JSON_PATH, dumpToFile.path)
     }
 
-    override fun extractConfigurationKind(files: MutableList<TestFile>): ConfigurationKind {
+    override fun extractConfigurationKind(files: List<TestFile>): ConfigurationKind {
         return ConfigurationKind.NO_KOTLIN_REFLECT
     }
 }

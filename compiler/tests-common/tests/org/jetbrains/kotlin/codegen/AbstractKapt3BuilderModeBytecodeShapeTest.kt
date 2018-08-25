@@ -29,19 +29,17 @@ abstract class AbstractKapt3BuilderModeBytecodeShapeTest : CodegenTestCase() {
         }
     }
 
-    override fun doMultiFileTest(wholeFile: File, files: MutableList<TestFile>, javaFilesDir: File?) {
+    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?) {
         val txtFile = File(wholeFile.parentFile, wholeFile.nameWithoutExtension + ".txt")
         compile(files, javaFilesDir)
-        KotlinTestUtils.assertEqualsToFile(txtFile, BytecodeListingTextCollectingVisitor.getText(classFileFactory))
+        KotlinTestUtils.assertEqualsToFile(txtFile, BytecodeListingTextCollectingVisitor.getText(classFileFactory!!))
     }
 
     override fun setupEnvironment(environment: KotlinCoreEnvironment) {
         AnalysisHandlerExtension.registerExtension(environment.project, PartialAnalysisHandlerExtension())
     }
 
-    override fun getClassBuilderFactory(): ClassBuilderFactory {
-        return TEST_LIGHT_ANALYSIS
-    }
+    override val classBuilderFactory = TEST_LIGHT_ANALYSIS
 
     override fun verifyWithDex(): Boolean {
         return false
