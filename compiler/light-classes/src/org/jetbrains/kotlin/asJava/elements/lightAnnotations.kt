@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.asJava.classes.cannotModify
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -45,6 +44,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument
 import org.jetbrains.kotlin.resolve.descriptorUtil.declaresOrInheritsDefaultValue
 import org.jetbrains.kotlin.resolve.jvm.annotations.findJvmOverloadsAnnotation
 import org.jetbrains.kotlin.resolve.source.getPsi
+import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.typeUtil.TypeNullability
@@ -259,7 +259,15 @@ class KtLightNullabilityAnnotation(val member: KtLightElement<*, PsiModifierList
 
         if (annotatedElement is KtParameter) {
             if (annotatedElement.containingClassOrObject?.isAnnotation() == true) return null
+            if (annotatedElement.ownerFunction?.hasModifier(KtTokens.PRIVATE_KEYWORD) == true) return null
             if (isNullableInJvmOverloads(annotatedElement)) return Nullable::class.java.name
+        }
+
+
+        if (annotatedElement is KtModifierListOwner &&
+            member !is KtLightParameter &&
+            annotatedElement.hasModifier(KtTokens.PRIVATE_KEYWORD)) {
+            return null
         }
 
         // don't annotate property setters
@@ -270,9 +278,10 @@ class KtLightNullabilityAnnotation(val member: KtLightElement<*, PsiModifierList
             // no need to annotate them explicitly except the case when overriding reference-type makes it non-primitive for Jvm
             if (!(annotatedElement is KtCallableDeclaration && annotatedElement.hasModifier(KtTokens.OVERRIDE_KEYWORD))) return null
 
-            val overriddenDescriptors =
-                (annotatedElement.analyze()[BindingContext.DECLARATION_TO_DESCRIPTOR, annotatedElement] as? CallableMemberDescriptor)?.overriddenDescriptors
-            if (overriddenDescriptors?.all { it.returnType == kotlinType } == true) return null
+            val descriptor = LightClassGenerationSupport.getInstance(project).resolveToDescriptor(annotatedElement)
+            if (descriptor is CallableDescriptor && descriptor.overriddenDescriptors.all { it.returnType == kotlinType }) {
+                return null
+            }
         }
         if (kotlinType.isUnit() && (annotatedElement !is KtValVarKeywordOwner)) return null // not annotate unit-functions
         if (kotlinType.isTypeParameter()) {
@@ -298,25 +307,31 @@ class KtLightNullabilityAnnotation(val member: KtLightElement<*, PsiModifierList
     internal fun KtTypeReference.getType(): KotlinType? = analyze()[BindingContext.TYPE, this]
 
     private fun getTargetType(annotatedElement: PsiElement): KotlinType? {
+        if (annotatedElement is KtConstructor<*>) return null
         if (annotatedElement is KtTypeReference) {
-            annotatedElement.getType()?.let { return it }
+            return annotatedElement.getType() ?: errorType()
         }
         if (annotatedElement is KtCallableDeclaration) {
             annotatedElement.typeReference?.getType()?.let { return it }
         }
         if (annotatedElement is KtNamedFunction) {
-            annotatedElement.bodyExpression?.let { it.getType(it.analyze()) }?.let { return it }
+            return annotatedElement.bodyExpression?.let { it.getType(it.analyze()) } ?: errorType()
         }
         if (annotatedElement is KtProperty) {
             annotatedElement.initializer?.let { it.getType(it.analyze()) }?.let { return it }
             annotatedElement.delegateExpression?.let { it.getType(it.analyze())?.arguments?.firstOrNull()?.type }?.let { return it }
+            annotatedElement.getter?.bodyExpression?.let { it.getType(it.analyze()) }?.let { return it }
         }
         annotatedElement.getParentOfType<KtProperty>(false)?.let {
             it.typeReference?.getType() ?: it.initializer?.let { it.getType(it.analyze()) }
         }?.let { return it }
+
+        if (annotatedElement is KtCallableDeclaration) return errorType()
+
         return null
     }
 
+    private fun errorType() = ErrorUtils.createErrorType("Unresolved")
 
     override fun getNameReferenceElement(): PsiJavaCodeReferenceElement? = null
 

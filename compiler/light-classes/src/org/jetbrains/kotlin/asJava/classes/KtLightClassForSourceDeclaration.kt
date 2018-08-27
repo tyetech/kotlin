@@ -51,7 +51,6 @@ import org.jetbrains.kotlin.asJava.elements.FakeFileForLightClass
 import org.jetbrains.kotlin.asJava.elements.KtLightIdentifier
 import org.jetbrains.kotlin.asJava.elements.KtLightModifierList
 import org.jetbrains.kotlin.asJava.elements.KtLightPsiReferenceList
-import org.jetbrains.kotlin.asJava.hasInterfaceDefaultImpls
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -309,7 +308,7 @@ abstract class KtLightClassForSourceDeclaration(protected val classOrObject: KtC
                 .filter { it.name != null }
                 .mapNotNullTo(result) { create(it) }
 
-        if (classOrObject.hasInterfaceDefaultImpls) {
+        if (classOrObject is KtClass && classOrObject.isInterface()) {
             result.add(KtLightClassForInterfaceDefaultImpls(classOrObject))
         }
         return result

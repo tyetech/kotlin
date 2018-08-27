@@ -16,10 +16,7 @@
 
 package org.jetbrains.kotlin.asJava.elements
 
-import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiModifierList
-import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.*
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
@@ -30,6 +27,7 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationWithTarget
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.isPropertyParameter
@@ -85,11 +83,21 @@ private fun computeAnnotations(lightModifierList: KtLightModifierList<*>): List<
         }.map { KtLightNonSourceAnnotation(lightModifierList, it) }
         return annotationsForEntries + specialAnnotationsOnAnnotationClass
     }
+    if (modifierListOwner is KtLightField) {
+        val original = (modifierListOwner.lightMemberOrigin as? LightMemberOriginForDeclaration)?.originalElement
+        if (original is KtObjectDeclaration &&
+            (original.hasModifier(KtTokens.PRIVATE_KEYWORD) || original.hasModifier(KtTokens.PROTECTED_KEYWORD))) {
+            val deprecated = JavaPsiFacade.getElementFactory(modifierListOwner.project)
+                .createAnnotationFromText("@" + CommonClassNames.JAVA_LANG_DEPRECATED, lightModifierList)
+            return annotationsForEntries + listOf(KtLightNonSourceAnnotation(lightModifierList, deprecated))
+        }
+    }
     if ((modifierListOwner is KtLightMember<*> && modifierListOwner !is KtLightFieldImpl.KtLightEnumConstant)
         || modifierListOwner is KtLightParameter) {
-        return annotationsForEntries +
-               @Suppress("UNCHECKED_CAST")
-               listOf(KtLightNullabilityAnnotation(modifierListOwner as KtLightElement<*, PsiModifierListOwner>, lightModifierList))
+        val nullability = KtLightNullabilityAnnotation(modifierListOwner as KtLightElement<*, PsiModifierListOwner>, lightModifierList)
+        if (nullability.qualifiedName != null) {
+            return annotationsForEntries + listOf(nullability)
+        }
     }
     return annotationsForEntries
 }
