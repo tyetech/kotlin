@@ -62,7 +62,7 @@ var KtFile.forcedTargetPlatform: TargetPlatform? by UserDataProperty(Key.create(
 
 fun Module.getAndCacheLanguageLevelByDependencies(): LanguageVersion {
     val facetSettings = KotlinFacetSettingsProvider.getInstance(project).getInitializedSettings(this)
-    val languageLevel = getLibraryLanguageLevel(this, null, facetSettings.platformKind?.kind)
+    val languageLevel = getLibraryLanguageLevel(this, null, facetSettings.platform?.kind)
 
     // Preserve inferred version in facet/project settings
     if (facetSettings.useProjectSettings) {
@@ -190,7 +190,7 @@ private fun Module.computeLanguageVersionSettings(): LanguageVersionSettings {
 
     val languageFeatures = facetSettings.mergedCompilerArguments?.configureLanguageFeatures(MessageCollector.NONE)?.apply {
         configureCoroutinesSupport(facetSettings.coroutineSupport)
-        configureMultiplatformSupport(facetSettings.platformKind?.kind, this@computeLanguageVersionSettings)
+        configureMultiplatformSupport(facetSettings.platform?.kind, this@computeLanguageVersionSettings)
     }.orEmpty()
 
     val analysisFlags = facetSettings.mergedCompilerArguments?.configureAnalysisFlags(MessageCollector.NONE).orEmpty()
@@ -204,7 +204,7 @@ private fun Module.computeLanguageVersionSettings(): LanguageVersionSettings {
 }
 
 val Module.platform: IdePlatform<*, *>?
-    get() = KotlinFacetSettingsProvider.getInstance(project).getSettings(this)?.platformKind ?: project.platform
+    get() = KotlinFacetSettingsProvider.getInstance(project).getInitializedSettings(this).platform ?: project.platform
 
 val Project.platform: IdePlatform<*, *>?
     get() {

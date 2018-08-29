@@ -25,7 +25,7 @@ class CommonPlatformKindResolution : IdePlatformKindResolution {
     override fun isModuleForPlatform(module: Module): Boolean {
         val settings = KotlinFacetSettingsProvider.getInstance(module.project)
             .getInitializedSettings(module)
-        return settings.platformKind.isCommon
+        return settings.platform.isCommon
     }
 
     override fun createBuiltIns(settings: PlatformAnalysisSettings, sdkContext: GlobalContextImpl): KotlinBuiltIns {

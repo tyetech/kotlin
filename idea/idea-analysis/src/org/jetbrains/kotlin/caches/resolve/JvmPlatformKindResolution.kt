@@ -26,7 +26,7 @@ class JvmPlatformKindResolution : IdePlatformKindResolution {
     override fun isModuleForPlatform(module: Module): Boolean {
         val settings = KotlinFacetSettingsProvider.getInstance(module.project)
             .getInitializedSettings(module)
-        return settings.platformKind.isJvm
+        return settings.platform.isJvm
     }
 
     override fun createBuiltIns(settings: PlatformAnalysisSettings, sdkContext: GlobalContextImpl): KotlinBuiltIns {

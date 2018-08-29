@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
 import javax.swing.Icon
 
-object CommonIdePlatformKindTooling : IdePlatformKindTooling {
+object CommonIdePlatformKindTooling : IdePlatformKindTooling() {
     const val MAVEN_COMMON_STDLIB_ID = "kotlin-stdlib-common" // TODO: KotlinCommonMavenConfigurator
 
     override val kind = CommonIdePlatformKind
@@ -47,12 +47,13 @@ object CommonIdePlatformKindTooling : IdePlatformKindTooling {
     }
 
     override fun getTestIcon(declaration: KtNamedDeclaration, descriptor: DeclarationDescriptor): Icon? {
-        val icons = IdePlatformKindTooling.getInstances()
-            .mapNotNull { getTestIcon(declaration, descriptor) }
-            .takeIf { it.isNotEmpty() }
-            ?: return null
-
-        return icons.distinct().singleOrNull() ?: AllIcons.RunConfigurations.TestState.Run
+        return IdePlatformKindTooling.getInstances()
+            .asSequence()
+            .filter { it != this }
+            .mapNotNull { it.getTestIcon(declaration, descriptor) }
+            .distinct()
+            .singleOrNull()
+            ?: AllIcons.RunConfigurations.TestState.Run
     }
 
     override fun acceptsAsEntryPoint(function: KtFunction): Boolean {

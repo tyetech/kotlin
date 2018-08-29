@@ -23,9 +23,8 @@ class JsPlatformKindResolution : IdePlatformKindResolution {
         get() = JsAnalyzerFacade
 
     override fun isModuleForPlatform(module: Module): Boolean {
-        val settings = KotlinFacetSettingsProvider.getInstance(module.project)
-            .getInitializedSettings(module)
-        return settings.platformKind.isJavaScript
+        val settings = KotlinFacetSettingsProvider.getInstance(module.project).getInitializedSettings(module)
+        return settings.platform.isJavaScript
     }
 
     override fun createBuiltIns(settings: PlatformAnalysisSettings, sdkContext: GlobalContextImpl): KotlinBuiltIns {
