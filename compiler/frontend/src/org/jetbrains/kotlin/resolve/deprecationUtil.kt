@@ -53,12 +53,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 private val JAVA_DEPRECATED = FqName("java.lang.Deprecated")
 
-interface Deprecation {
-    val deprecationLevel: DeprecationLevelValue
-    val message: String?
-    val target: DeclarationDescriptor
-}
-
 fun Deprecation.deprecatedByOverriddenMessage(): String? = (this as? DeprecatedByOverridden)?.additionalMessage()
 
 fun Deprecation.deprecatedByAnnotationReplaceWithExpression(): String? {
@@ -193,11 +187,6 @@ internal fun createDeprecationDiagnostic(
     }
 }
 
-// values from kotlin.DeprecationLevel
-enum class DeprecationLevelValue {
-    WARNING, ERROR, HIDDEN
-}
-
 class DeprecationResolver(
     storageManager: StorageManager,
     private val languageVersionSettings: LanguageVersionSettings
@@ -319,6 +308,7 @@ class DeprecationResolver(
                 result.add(deprecation)
             }
             getDeprecationByCoroutinesVersion(target)?.let(result::add)
+            getDeprecationFromUserData(target)?.let(result::add)
         }
 
         fun addUseSiteTargetedDeprecationIfPresent(annotatedDescriptor: DeclarationDescriptor, useSiteTarget: AnnotationUseSiteTarget?) {
@@ -366,6 +356,9 @@ class DeprecationResolver(
             INCOMPATIBLE -> DeprecatedExperimentalCoroutine(target, ERROR)
         }
     }
+
+    private fun getDeprecationFromUserData(target: DeclarationDescriptor): Deprecation? =
+        target.safeAs<CallableDescriptor>()?.getUserData(DEPRECATED_FUNCTION_KEY)
 
     private fun getDeprecationByVersionRequirement(target: DeclarationDescriptor): List<DeprecatedByVersionRequirement> {
         fun createVersion(version: String): MavenComparableVersion? = try {
