@@ -4,9 +4,9 @@ fun foo(f: (String) -> Unit) {}
 fun bar(s: String) {}
 
 fun test() {
-    foo { s ->
+    foo {
         foo {
-            bar(it<caret>)
+            bar(""<caret>)
         }
     }
 }
